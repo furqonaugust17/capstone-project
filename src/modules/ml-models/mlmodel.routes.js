@@ -1,0 +1,18 @@
+'use strict';
+const express = require('express');
+const mlModelController = require('./mlmodel.controller');
+const { authenticate, requireAdmin } = require('../../middlewares/auth.middleware');
+const { uploadTflite } = require('../../middlewares/upload.middleware');
+
+const router = express.Router();
+
+router.get('/', authenticate, mlModelController.index);
+router.get('/active', authenticate, mlModelController.active);
+router.get('/:id', authenticate, mlModelController.show);
+router.post('/', authenticate, requireAdmin, uploadTflite.single('file'), mlModelController.store);
+router.put('/:id', authenticate, requireAdmin, uploadTflite.single('file'), mlModelController.update);
+router.patch('/:id/activate', authenticate, requireAdmin, mlModelController.activate);
+router.post('/:id/animals', authenticate, requireAdmin, mlModelController.syncAnimals);
+router.delete('/:id', authenticate, requireAdmin, mlModelController.destroy);
+
+module.exports = router;

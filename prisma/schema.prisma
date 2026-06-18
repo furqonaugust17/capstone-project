@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id            String          @id @default(uuid())
+  username      String          @unique
+  email         String          @unique
+  passwordHash  String
+  displayName   String?
+  avatarUrl     String?
+  totalPoint    Int             @default(0)
+  role          Role            @default(USER)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  refreshTokens     RefreshToken[]
+  gameSessions      GameSession[]
+  userInventories   UserInventory[]
+  purchaseHistories PurchaseHistory[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Animal {
+  id            String        @id @default(uuid())
+  name          String
+  description   String?
+  thumbnailUrl  String?
+  hintImageUrl  String?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  animalModels  AnimalModel[]
+  gameSessions   GameSession[]
+
+  @@map("animals")
+}
+
+model MLModel {
+  id                 String        @id @default(uuid())
+  name               String
+  version            String
+  fileUrl            String
+  labelsUrl          String?
+  inputSize          Int?
+  framework          String?
+  accuracy           Float?
+  isActive           Boolean        @default(true)
+  firebaseModelName  String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  animalModels       AnimalModel[]
+  gameSessions       GameSession[]
+
+  @@map("ml_models")
+}
+
+model AnimalModel {
+  id        String   @id @default(uuid())
+  animalId  String
+  modelId   String
+  animal    Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  model     MLModel  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([animalId, modelId])
+  @@map("animal_models")
+}
+
+model GameSession {
+  id               String   @id @default(uuid())
+  userId           String
+  animalId         String
+  modelId          String
+  predictionLabel  String
+  confidenceScore  Float
+  gameScore       Int
+  focusScore       Float?
+  drawingDuration  Int
+  startedAt        DateTime
+  finishedAt       DateTime @default(now())
+  createdAt        DateTime @default(now())
+
+  user             User     @relation(fields: [userId], references: [id])
+  animal           Animal   @relation(fields: [animalId], references: [id])
+  model            MLModel  @relation(fields: [modelId], references: [id])
+
+  @@index([userId])
+  @@index([animalId])
+  @@index([modelId])
+  @@map("game_sessions")
+}
+
+enum ItemCategory {
+  AVATAR
+  FRAME
+  STICKER
+  THEME
+}
+
+enum ItemRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+model ShopItem {
+  id                String            @id @default(uuid())
+  name              String
+  description       String?
+  imageUrl          String?
+  price             Int
+  category          ItemCategory
+  rarity            ItemRarity
+  isActive          Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  userInventories   UserInventory[]
+  purchaseHistories PurchaseHistory[]
+
+  @@map("shop_items")
+}
+
+model UserInventory {
+  id         String   @id @default(uuid())
+  userId     String
+  itemId     String
+  quantity   Int      @default(1)
+  acquiredAt DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  shopItem   ShopItem @relation(fields: [itemId], references: [id])
+
+  @@unique([userId, itemId])
+  @@map("user_inventories")
+}
+
+model PurchaseHistory {
+  id          String   @id @default(uuid())
+  userId      String
+  itemId      String
+  price       Int
+  purchasedAt DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  shopItem    ShopItem @relation(fields: [itemId], references: [id])
+
+  @@map("purchase_histories")
+}

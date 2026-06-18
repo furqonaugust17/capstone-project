@@ -31,6 +31,7 @@ const shopRoutes = require('./modules/shop/shop.routes');
 const purchaseRoutes = require('./modules/purchase/purchase.routes');
 const inventoryRoutes = require('./modules/inventory/inventory.routes');
 const achievementRoutes = require('./modules/achievements/achievement.routes');
+const leaderboardRoutes = require('./modules/leaderboard/leaderboard.routes');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
@@ -44,6 +45,7 @@ app.use('/api/shop', shopRoutes);
 app.use('/api/purchase', purchaseRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/achievements', achievementRoutes);
+app.use('/api/leaderboards', leaderboardRoutes);
 
 // 404 Route
 app.use((req, res) => {
@@ -55,5 +57,8 @@ app.use((req, res) => {
 
 // Global Error Handler
 app.use(errorHandler);
+
+// Initialize Cron Jobs
+require('./jobs/cron');
 
 module.exports = app;

@@ -1,5 +1,6 @@
 'use strict';
 const prisma = require('../../config/database');
+const { checkAchievements } = require('../achievements/achievement.checker');
 
 const createSession = async (userId, data) => {
   // Use a Prisma transaction to ensure both operations succeed or fail together
@@ -28,6 +29,42 @@ const createSession = async (userId, data) => {
         },
       },
     });
+
+    // 3. Update UserStatistic
+    const userStat = await tx.userStatistic.findUnique({ where: { userId } });
+    if (userStat) {
+      const newTotalGames = userStat.totalGames + 1;
+      const newTotalScore = userStat.totalScore + data.gameScore;
+      const newHighestScore = Math.max(userStat.highestScore, data.gameScore);
+      const newTotalDrawingTime = userStat.totalDrawingTime + data.drawingDuration;
+      const focus = data.focusScore || 0;
+      const newAverageFocus = ((userStat.averageFocus * userStat.totalGames) + focus) / newTotalGames;
+
+      await tx.userStatistic.update({
+        where: { userId },
+        data: {
+          totalGames: newTotalGames,
+          totalScore: newTotalScore,
+          highestScore: newHighestScore,
+          totalDrawingTime: newTotalDrawingTime,
+          averageFocus: newAverageFocus,
+        }
+      });
+    } else {
+      await tx.userStatistic.create({
+        data: {
+          userId,
+          totalGames: 1,
+          totalScore: data.gameScore,
+          highestScore: data.gameScore,
+          totalDrawingTime: data.drawingDuration,
+          averageFocus: data.focusScore || 0,
+        }
+      });
+    }
+
+    // 4. Check achievements
+    await checkAchievements(userId, tx);
 
     return session;
   });

@@ -26,9 +26,9 @@ model User {
   refreshTokens     RefreshToken[]
   gameSessions      GameSession[]
   userInventories   UserInventory[]
-  purchaseHistories PurchaseHistory[]
-  userAchievements  UserAchievement[]
-  userStatistic     UserStatistic?
+  purchaseHistories   PurchaseHistory[]
+  userAchievements    UserAchievement[]
+  userStatistic       UserStatistic?
 
   @@map("users")
 }
@@ -52,9 +52,9 @@ model Animal {
   hintImageUrl  String?
   isActive      Boolean        @default(true)
   createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  animalModels  AnimalModel[]
-  gameSessions   GameSession[]
+  updatedAt       DateTime        @updatedAt
+  animalModels    AnimalModel[]
+  gameSessions    GameSession[]
 
   @@map("animals")
 }
@@ -220,4 +220,21 @@ model UserStatistic {
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_statistics")
+}
+
+enum LeaderboardPeriod {
+  WEEKLY
+  MONTHLY
+  SEASONAL
+  ALL_TIME
+}
+
+model LeaderboardSnapshot {
+  id          String            @id @default(uuid())
+  period      LeaderboardPeriod
+  periodLabel String
+  rankings    Json
+  generatedAt DateTime          @default(now())
+
+  @@map("leaderboard_snapshots")
 }

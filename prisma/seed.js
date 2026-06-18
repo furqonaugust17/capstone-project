@@ -158,6 +158,24 @@ async function main() {
     }
   }
 
+  // 7. Create Dummy Achievements
+  const achievements = [
+    { name: 'First Steps', description: 'Play your first 5 games', rewardPoint: 100, triggerType: 'TOTAL_GAMES', triggerValue: 5 },
+    { name: 'Dedicated Artist', description: 'Play 50 games', rewardPoint: 500, triggerType: 'TOTAL_GAMES', triggerValue: 50 },
+    { name: 'High Scorer', description: 'Reach 1000 total score', rewardPoint: 200, triggerType: 'TOTAL_SCORE', triggerValue: 1000 },
+    { name: 'Laser Focus', description: 'Achieve an average focus score of 0.8', rewardPoint: 300, triggerType: 'FOCUS_SCORE', triggerValue: 0 } // use 0 for easy testing, ideally 80 if percentage
+  ];
+
+  for (const ach of achievements) {
+    const existing = await prisma.achievement.findFirst({ where: { name: ach.name } });
+    if (!existing) {
+      await prisma.achievement.create({ data: ach });
+      console.log(`✅ Achievement created: ${ach.name}`);
+    } else {
+      console.log(`ℹ️ Achievement already exists: ${ach.name}`);
+    }
+  }
+
   console.log('✨ Seeding completed!');
 }
 

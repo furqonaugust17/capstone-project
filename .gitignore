@@ -32,6 +32,8 @@ serviceAccountKey.json
 
 /src/generated/prisma
 
+# Testing
+coverage/
 
 docs/task
 docs/tasks-full.md

@@ -2,7 +2,7 @@
 
 Dokumentasi ini berisi panduan lengkap integrasi API backend untuk aplikasi **Educational Animal Drawing Game** berbasis Flutter. Hanya mencakup endpoint yang dibutuhkan oleh player (`role: USER`).
 
-> **Terakhir diperbarui**: 12 Juni 2026
+> **Terakhir diperbarui**: 22 Juni 2026
 
 ---
 
@@ -49,6 +49,8 @@ Endpoint yang mendukung paginasi mengembalikan format berikut di dalam `data`:
 }
 ```
 
+> **Catatan Caching**: Beberapa endpoint GET di-cache oleh Redis di sisi server (`/animals`, `/ml-models/active`, `/leaderboards`). Data yang di-cache akan otomatis di-invalidasi ketika ada perubahan data terkait, sehingga Flutter tidak perlu menangani logika ini.
+
 ---
 
 ## 1️⃣ Authentication (`/api/auth`)
@@ -56,6 +58,7 @@ Endpoint yang mendukung paginasi mengembalikan format berikut di dalam `data`:
 ### Register
 - **Method**: `POST /auth/register`
 - **Auth**: ❌ Tidak perlu
+- **Rate Limit**: 10 request / 15 menit per IP
 - **Request Body**:
   ```json
   {
@@ -88,6 +91,7 @@ Endpoint yang mendukung paginasi mengembalikan format berikut di dalam `data`:
 ### Login
 - **Method**: `POST /auth/login`
 - **Auth**: ❌ Tidak perlu
+- **Rate Limit**: 10 request / 15 menit per IP
 - **Request Body**:
   ```json
   {
@@ -157,6 +161,7 @@ Digunakan untuk menampilkan daftar hewan yang tersedia untuk digambar.
 - **Method**: `GET /animals`
 - **Auth**: ✅ Required
 - **Query Params**: `?page=1&limit=10`
+- **Cache**: ✅ 5 menit (server-side Redis)
 - **Response** (`data`): Pagination object berisi array `Animal`.
 - **Contoh item**:
   ```json
@@ -187,6 +192,7 @@ Digunakan untuk mengunduh model TFLite yang akan mendeteksi hasil gambar pemain.
 ### ⭐ Get Active Model (WAJIB dipanggil saat aplikasi dimulai)
 - **Method**: `GET /ml-models/active`
 - **Auth**: ✅ Required
+- **Cache**: ✅ 10 menit (server-side Redis)
 - **Response** (`data`):
   ```json
   {
@@ -200,6 +206,7 @@ Digunakan untuk mengunduh model TFLite yang akan mendeteksi hasil gambar pemain.
     "accuracy": 92.5,
     "isActive": true,
     "firebaseModelName": null,
+    "activatedAt": "2026-06-20T...",
     "createdAt": "2026-06-12T...",
     "updatedAt": "2026-06-12T...",
     "animalModels": [
@@ -261,7 +268,10 @@ Digunakan untuk menyimpan hasil dan riwayat permainan setiap kali pemain selesai
   - `focusScore`: float, opsional
   - `drawingDuration`: integer dalam detik (wajib)
   - `startedAt`: ISO 8601 datetime (wajib)
-- **Side Effect**: Nilai `gameScore` otomatis ditambahkan ke `totalPoint` pada profil user (menggunakan database transaction).
+- **Side Effects**:
+  - Nilai `gameScore` otomatis ditambahkan ke `totalPoint` pada profil user.
+  - `UserStatistic` (totalGames, highestScore, averageFocus, dll) diperbarui secara otomatis.
+  - `LearningProfile` untuk hewan terkait diperbarui (adaptive learning).
 - **Response** (`data`): Objek `GameSession` yang baru dibuat.
 
 #### Panduan Integrasi Flutter:
@@ -315,6 +325,143 @@ Submit ke endpoint POST /game-sessions
 
 ---
 
+## 5️⃣ Statistics (`/api/statistics`)
+
+Digunakan untuk menampilkan statistik pribadi pemain.
+
+### Get My Statistics
+- **Method**: `GET /statistics/my`
+- **Auth**: ✅ Required
+- **Response** (`data`):
+  ```json
+  {
+    "userId": "uuid",
+    "totalGames": 42,
+    "totalScore": 3500,
+    "highestScore": 200,
+    "averageFocus": 0.78,
+    "totalDrawingTime": 1890,
+    "updatedAt": "2026-06-22T..."
+  }
+  ```
+- **Catatan Flutter**: Data ini terupdate otomatis setiap kali pemain menyelesaikan game session. Tidak perlu submit manual.
+
+---
+
+## 6️⃣ Shop (`/api/shop`)
+
+Digunakan untuk menampilkan item yang bisa dibeli pemain menggunakan point.
+
+### Get All Shop Items
+- **Method**: `GET /shop`
+- **Auth**: ✅ Required
+- **Query Params**: `?page=1&limit=10&category=AVATAR&rarity=RARE`
+  - `category`: opsional, filter berdasarkan kategori (`AVATAR`, `FRAME`, `STICKER`, `THEME`)
+  - `rarity`: opsional, filter berdasarkan kelangkaan (`COMMON`, `RARE`, `EPIC`, `LEGENDARY`)
+- **Response** (`data`): Pagination object berisi array `ShopItem`.
+- **Contoh item**:
+  ```json
+  {
+    "id": "uuid",
+    "name": "Golden Frame",
+    "description": "A premium golden frame for your profile.",
+    "imageUrl": "https://...",
+    "price": 500,
+    "category": "FRAME",
+    "rarity": "EPIC",
+    "isActive": true,
+    "createdAt": "2026-06-12T...",
+    "updatedAt": "2026-06-12T..."
+  }
+  ```
+
+### Get Shop Item Detail
+- **Method**: `GET /shop/:id`
+- **Auth**: ✅ Required
+- **Response** (`data`): Objek `ShopItem` tunggal.
+
+---
+
+## 7️⃣ Purchase (`/api/purchase`)
+
+Digunakan untuk membeli item dari shop menggunakan point.
+
+### Buy Item
+- **Method**: `POST /purchase/:itemId`
+- **Auth**: ✅ Required
+- **Response** (`data`): Objek `PurchaseHistory`.
+- **Side Effects**:
+  - `totalPoint` pada user dikurangi sesuai harga item.
+  - Item ditambahkan ke `UserInventory`.
+- **Error Cases**:
+  - `400`: Poin tidak cukup ("Insufficient points")
+  - `404`: Item tidak ditemukan
+
+---
+
+## 8️⃣ Inventory (`/api/inventory`)
+
+Digunakan untuk menampilkan item yang dimiliki pemain.
+
+### Get My Inventory
+- **Method**: `GET /inventory`
+- **Auth**: ✅ Required
+- **Response** (`data`): Array objek `UserInventory` beserta relasi `shopItem`.
+
+### Get My Purchase History
+- **Method**: `GET /inventory/history`
+- **Auth**: ✅ Required
+- **Response** (`data`): Array objek `PurchaseHistory` beserta relasi `shopItem`.
+
+---
+
+## 9️⃣ Leaderboard (`/api/leaderboards`)
+
+Digunakan untuk menampilkan peringkat pemain.
+
+### Get Live Leaderboard
+- **Method**: `GET /leaderboards/live`
+- **Auth**: ✅ Required
+- **Query Params**: `?limit=100` (opsional, default 100)
+- **Cache**: ✅ 1 menit (server-side Redis)
+- **Response** (`data`): Array user diurutkan berdasarkan `totalScore` tertinggi.
+- **Contoh item**:
+  ```json
+  {
+    "userId": "uuid",
+    "totalScore": 5000,
+    "totalGames": 50,
+    "user": {
+      "username": "player1",
+      "displayName": "Player One",
+      "avatarUrl": "https://..."
+    }
+  }
+  ```
+
+### Get My Rank
+- **Method**: `GET /leaderboards/me`
+- **Auth**: ✅ Required
+- **Response** (`data`):
+  ```json
+  {
+    "rank": 5,
+    "totalScore": 3500,
+    "totalGames": 42
+  }
+  ```
+
+### Get Leaderboard Snapshot
+- **Method**: `GET /leaderboards/snapshot`
+- **Auth**: ✅ Required
+- **Query Params**: `?period=WEEKLY&periodLabel=2026-W25` (wajib)
+  - `period`: `WEEKLY`, `MONTHLY`, `SEASONAL`, `ALL_TIME`
+  - `periodLabel`: label periode (cth: `2026-W25`, `2026-06`, `Season-1`)
+- **Cache**: ✅ 1 jam (server-side Redis)
+- **Response** (`data`): Objek `LeaderboardSnapshot` berisi `rankings` (JSON array).
+
+---
+
 ## 📎 Data Models Reference
 
 ### User
@@ -352,6 +499,7 @@ Submit ke endpoint POST /game-sessions
 | `inputSize` | int? | Dimensi input (misal: 224) |
 | `accuracy` | float? | Akurasi model (0-100) |
 | `isActive` | boolean | Apakah model yang sedang aktif |
+| `activatedAt` | datetime? | Waktu terakhir model diaktifkan |
 | `animalModels` | array | Relasi hewan yang didukung model |
 
 ### GameSession
@@ -369,6 +517,30 @@ Submit ke endpoint POST /game-sessions
 | `startedAt` | datetime | Waktu mulai menggambar |
 | `finishedAt` | datetime | Waktu selesai (otomatis) |
 
+### UserStatistic
+| Field | Type | Keterangan |
+|---|---|---|
+| `userId` | string (UUID) | Primary key (FK ke User) |
+| `totalGames` | int | Jumlah total permainan |
+| `totalScore` | int | Akumulasi total skor |
+| `highestScore` | int | Skor tertinggi sepanjang masa |
+| `averageFocus` | float | Rata-rata focus score |
+| `totalDrawingTime` | int | Total waktu menggambar (detik) |
+| `updatedAt` | datetime | Terakhir diupdate |
+
+### ShopItem
+| Field | Type | Keterangan |
+|---|---|---|
+| `id` | string (UUID) | Primary key |
+| `name` | string | Nama item |
+| `description` | string? | Deskripsi |
+| `imageUrl` | string? | URL gambar item |
+| `price` | int | Harga dalam point |
+| `category` | enum | `AVATAR`, `FRAME`, `STICKER`, `THEME` |
+| `rarity` | enum | `COMMON`, `RARE`, `EPIC`, `LEGENDARY` |
+| `isActive` | boolean | Status aktif |
+
+
 ---
 
 ## 🔄 Flow Integrasi Game (End-to-End)
@@ -381,27 +553,39 @@ Submit ke endpoint POST /game-sessions
 │     ├─ Ada → GET /auth/me (validasi session)            │
 │     └─ Tidak ada → Tampilkan Login Screen               │
 │                                                         │
-│  2. GET /ml-models/active                               │
+│  2. GET /ml-models/active (cached 10 menit)             │
 │     ├─ Bandingkan version dengan cache lokal             │
 │     ├─ Jika beda → Download fileUrl ke local storage     │
 │     └─ Simpan daftar animalModels sebagai label map      │
 │                                                         │
-│  3. GET /animals?limit=100                              │
+│  3. GET /animals?limit=100 (cached 5 menit)             │
 │     └─ Simpan daftar hewan untuk UI pemilihan            │
+│                                                         │
+│  4. GET /statistics/my                                  │
+│     └─ Tampilkan statistik pribadi pemain                │
 ├─────────────────────────────────────────────────────────┤
 │                    GAMEPLAY                             │
 │                                                         │
-│  4. User pilih hewan → Catat startedAt                  │
-│  5. User menggambar → Hitung drawingDuration            │
-│  6. Jalankan inferensi TFLite lokal                     │
+│  5. User pilih hewan → Catat startedAt                  │
+│  6. User menggambar → Hitung drawingDuration            │
+│  7. Jalankan inferensi TFLite lokal                     │
 │     └─ Dapat predictionLabel & confidenceScore          │
-│  7. Hitung gameScore berdasarkan bisnis logic           │
-│  8. POST /game-sessions (submit hasil)                  │
+│  8. Hitung gameScore berdasarkan bisnis logic           │
+│  9. POST /game-sessions (submit hasil)                  │
+│      └─ Side effect: update point, stats                │
+├─────────────────────────────────────────────────────────┤
+│                    SOCIAL & SHOP                        │
+│                                                         │
+│  10. GET /leaderboards/live (peringkat real-time)       │
+│  11. GET /leaderboards/me (ranking pribadi)             │
+│  12. GET /shop (daftar item toko)                       │
+│  13. POST /purchase/:itemId (beli item)                 │
+│  14. GET /inventory (item yang dimiliki)                │
 ├─────────────────────────────────────────────────────────┤
 │                    HISTORY                              │
 │                                                         │
-│  9. GET /game-sessions (riwayat bermain)                │
-│  10. GET /auth/me (lihat totalPoint terbaru)            │
+│  15. GET /game-sessions (riwayat bermain)               │
+│  16. GET /auth/me (lihat totalPoint terbaru)            │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -411,8 +595,10 @@ Submit ke endpoint POST /game-sessions
 
 | Code | Kondisi | Aksi Flutter |
 |---|---|---|
+| `400` | Validasi gagal / Poin tidak cukup | Tampilkan pesan error dari `message` |
 | `401` | Token expired / invalid | Panggil `POST /auth/refresh`, jika gagal → redirect ke Login |
 | `403` | Akses ditolak (bukan pemilik data) | Tampilkan pesan error |
 | `404` | Data tidak ditemukan | Tampilkan empty state |
 | `409` | Email/username sudah terdaftar (saat register) | Tampilkan pesan validasi |
+| `429` | Rate limit tercapai (terlalu banyak request) | Tampilkan pesan "Coba lagi nanti" |
 | `500` | Internal server error | Tampilkan pesan error generik |

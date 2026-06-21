@@ -4,7 +4,7 @@ const { checkAchievements } = require('../achievements/achievement.checker');
 
 const createSession = async (userId, data) => {
   // Use a Prisma transaction to ensure both operations succeed or fail together
-  return await prisma.$transaction(async (tx) => {
+  const sessionResult = await prisma.$transaction(async (tx) => {
     // 1. Create the game session
     const session = await tx.gameSession.create({
       data: {
@@ -68,6 +68,22 @@ const createSession = async (userId, data) => {
 
     return session;
   });
+
+  // Call adaptive learning logic after successful transaction
+  try {
+    const analyticsService = require('../analytics/analytics.service');
+    await analyticsService.updateLearningProfile(userId, {
+      animalId: data.animalId,
+      gameScore: data.gameScore,
+      confidenceScore: data.confidenceScore,
+    });
+  } catch (err) {
+    // We don't want to fail the session creation if analytics fails
+    const logger = require('../../utils/logger');
+    logger.error('Failed to update learning profile:', err);
+  }
+
+  return sessionResult;
 };
 
 const getMySessions = async (userId, page = 1, limit = 10) => {

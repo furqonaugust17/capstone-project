@@ -29,6 +29,7 @@ model User {
   purchaseHistories   PurchaseHistory[]
   userAchievements    UserAchievement[]
   userStatistic       UserStatistic?
+  learningProfiles    LearningProfile[]
 
   @@map("users")
 }
@@ -55,6 +56,7 @@ model Animal {
   updatedAt       DateTime        @updatedAt
   animalModels    AnimalModel[]
   gameSessions    GameSession[]
+  learningProfiles LearningProfile[]
 
   @@map("animals")
 }
@@ -70,6 +72,7 @@ model MLModel {
   accuracy           Float?
   isActive           Boolean        @default(true)
   firebaseModelName  String?
+  activatedAt        DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   animalModels       AnimalModel[]
@@ -238,4 +241,22 @@ model LeaderboardSnapshot {
   generatedAt DateTime          @default(now())
 
   @@map("leaderboard_snapshots")
+}
+
+model LearningProfile {
+  id              String   @id @default(uuid())
+  userId          String
+  animalId        String
+  attemptCount    Int      @default(0)
+  avgScore        Float    @default(0.0)
+  avgConfidence   Float    @default(0.0)
+  lastPlayedAt    DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animal          Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, animalId])
+  @@map("learning_profiles")
 }

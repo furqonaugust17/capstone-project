@@ -55,6 +55,17 @@ const syncAnimals = async (req, res) => {
   res.status(200).json(successResponse(result, 200, 'Animals synced to ML Model successfully'));
 };
 
+const history = async (req, res) => {
+  const models = await mlModelService.getModelHistory(req.params.id);
+  res.status(200).json(successResponse(models, 200, 'ML Model history fetched successfully'));
+};
+
+const rollback = async (req, res) => {
+  const model = await mlModelService.activateModel(req.params.id);
+  await clearCache('ml-models:*');
+  res.status(200).json(successResponse(model, 200, 'ML Model rolled back successfully'));
+};
+
 module.exports = {
   index,
   show,
@@ -64,4 +75,6 @@ module.exports = {
   destroy,
   syncAnimals,
   update,
+  history,
+  rollback,
 };

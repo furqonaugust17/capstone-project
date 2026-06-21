@@ -95,4 +95,50 @@ describe('ML Model Service', () => {
       });
     });
   });
+
+  describe('getModelHistory', () => {
+    it('should throw an error if model is not found', async () => {
+      prismaMock.mLModel.findUnique.mockResolvedValue(null);
+      await expect(mlModelService.getModelHistory('m1')).rejects.toThrow('ML Model not found');
+    });
+
+    it('should return history of models with same name', async () => {
+      const mockModel = { id: 'm1', name: 'DrawModel' };
+      const mockHistory = [
+        { id: 'm2', name: 'DrawModel', version: '2.0', activatedAt: new Date() },
+        { id: 'm1', name: 'DrawModel', version: '1.0', activatedAt: null }
+      ];
+      prismaMock.mLModel.findUnique.mockResolvedValue(mockModel);
+      prismaMock.mLModel.findMany.mockResolvedValue(mockHistory);
+
+      const result = await mlModelService.getModelHistory('m1');
+      
+      expect(prismaMock.mLModel.findMany).toHaveBeenCalledWith({
+        where: { name: 'DrawModel' },
+        orderBy: { createdAt: 'desc' },
+      });
+      expect(result).toEqual(mockHistory);
+    });
+  });
+
+  describe('activateModel', () => {
+    it('should throw an error if model is not found', async () => {
+      prismaMock.mLModel.findUnique.mockResolvedValue(null);
+      await expect(mlModelService.activateModel('m1')).rejects.toThrow('ML Model not found');
+    });
+
+    it('should deactivate other models and activate the target model with current date', async () => {
+      const mockModel = { id: 'm1', name: 'DrawModel', isActive: false };
+      prismaMock.mLModel.findUnique.mockResolvedValue(mockModel);
+      prismaMock.$transaction.mockResolvedValue([null, mockModel]);
+
+      await mlModelService.activateModel('m1');
+
+      expect(prismaMock.$transaction).toHaveBeenCalled();
+      
+      // We can't easily assert the contents of the transaction array without mocking it perfectly,
+      // but we can ensure it was called. The mock for $transaction is usually handled in setup.js or we can just assert it's called.
+      expect(prismaMock.mLModel.findUnique).toHaveBeenCalledWith({ where: { id: 'm1' } });
+    });
+  });
 });

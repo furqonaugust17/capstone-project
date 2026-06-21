@@ -94,6 +94,7 @@ const purchaseRoutes = require('./modules/purchase/purchase.routes');
 const inventoryRoutes = require('./modules/inventory/inventory.routes');
 const achievementRoutes = require('./modules/achievements/achievement.routes');
 const leaderboardRoutes = require('./modules/leaderboard/leaderboard.routes');
+const analyticsRoutes = require('./modules/analytics/analytics.routes');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
@@ -108,6 +109,7 @@ app.use('/api/purchase', purchaseRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('/api/leaderboards', leaderboardRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // 404 Route
 app.use((req, res) => {

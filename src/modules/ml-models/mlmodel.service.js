@@ -85,11 +85,26 @@ const activateModel = async (id) => {
     }),
     prisma.mLModel.update({
       where: { id },
-      data: { isActive: true },
+      data: { isActive: true, activatedAt: new Date() },
     }),
   ]);
 
   return await prisma.mLModel.findUnique({ where: { id } });
+};
+
+const getModelHistory = async (id) => {
+  const model = await prisma.mLModel.findUnique({ where: { id } });
+  if (!model) {
+    const error = new Error('ML Model not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Get all models with the same name, ordered by created/activated time
+  return await prisma.mLModel.findMany({
+    where: { name: model.name },
+    orderBy: { createdAt: 'desc' },
+  });
 };
 
 const deleteModel = async (id) => {
@@ -194,5 +209,6 @@ module.exports = {
   deleteModel,
   syncAnimals,
   updateModel,
-  getModelById
+  getModelById,
+  getModelHistory
 };

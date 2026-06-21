@@ -3,8 +3,10 @@
 const app = require('./app');
 const { env } = require('./config/env');
 
+const logger = require('./utils/logger');
+
 const PORT = env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT} [${env.NODE_ENV}]`);
+  logger.info(`🚀 Server running on port ${PORT} [${env.NODE_ENV}]`);
 });

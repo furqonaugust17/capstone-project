@@ -219,6 +219,7 @@ model UserStatistic {
 
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([totalScore(sort: Desc)])
   @@map("user_statistics")
 }
 

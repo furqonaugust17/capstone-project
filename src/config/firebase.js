@@ -2,6 +2,7 @@
 
 const admin = require('firebase-admin');
 const { env } = require('./env');
+const logger = require('../utils/logger');
 
 let firebaseApp;
 
@@ -24,10 +25,10 @@ function initFirebase() {
         }),
       });
     } else {
-      console.warn('⚠️ Firebase Admin SDK not configured. ML Model deployment will be unavailable.');
+      logger.warn('⚠️ Firebase Admin SDK not configured. ML Model deployment will be unavailable.');
     }
   } catch (error) {
-    console.error('❌ Firebase Admin SDK Initialization Error:', error);
+    logger.error('❌ Firebase Admin SDK Initialization Error:', error);
   }
 
   return firebaseApp;

@@ -2,6 +2,7 @@
 const mlModelService = require('./mlmodel.service');
 const { createModelSchema } = require('./mlmodel.validation');
 const { successResponse } = require('../../utils/response');
+const { clearCache } = require('../../config/redis');
 
 const index = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -28,11 +29,13 @@ const store = async (req, res) => {
 
 const activate = async (req, res) => {
   const model = await mlModelService.activateModel(req.params.id);
+  await clearCache('ml-models:*');
   res.status(200).json(successResponse(model, 200, 'ML Model activated successfully'));
 };
 
 const destroy = async (req, res) => {
   await mlModelService.deleteModel(req.params.id);
+  await clearCache('ml-models:*');
   res.status(200).json(successResponse(null, 200, 'ML Model deleted successfully'));
 };
 
@@ -40,6 +43,7 @@ const update = async (req, res) => {
   const { updateModelSchema } = require('./mlmodel.validation');
   const data = updateModelSchema.parse(req.body);
   const model = await mlModelService.updateModel(req.params.id, data, req.file);
+  await clearCache('ml-models:*');
   res.status(200).json(successResponse(model, 200, 'ML Model updated successfully'));
 };
 
@@ -47,6 +51,7 @@ const syncAnimals = async (req, res) => {
   const { syncAnimalsSchema } = require('./mlmodel.validation');
   const data = syncAnimalsSchema.parse(req.body);
   const result = await mlModelService.syncAnimals(req.params.id, data.animalIds);
+  await clearCache('ml-models:*');
   res.status(200).json(successResponse(result, 200, 'Animals synced to ML Model successfully'));
 };
 

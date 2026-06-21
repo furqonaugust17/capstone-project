@@ -73,7 +73,7 @@ const updateShopItem = async (id, data, file) => {
   if (file) {
     if (imageUrl) {
       const oldKey = imageUrl.replace(`${env.R2_PUBLIC_URL}/`, '');
-      await deleteFromR2(oldKey).catch(() => {});
+      await deleteFromR2(oldKey).catch(() => { });
     }
 
     const ext = path.extname(file.originalname);

@@ -19,6 +19,8 @@ const getSnapshot = async (req, res) => {
   res.status(200).json(successResponse(result, 200, 'Leaderboard snapshot fetched successfully'));
 };
 
+const { clearCache } = require('../../config/redis');
+
 const generateSnapshot = async (req, res) => {
   const { period, periodLabel, limit } = req.body;
   if (!period || !periodLabel) {
@@ -27,6 +29,7 @@ const generateSnapshot = async (req, res) => {
     throw error;
   }
   const result = await leaderboardService.generateSnapshot(period, periodLabel, limit);
+  await clearCache('leaderboard:*');
   res.status(201).json(successResponse(result, 201, 'Leaderboard snapshot generated successfully'));
 };
 

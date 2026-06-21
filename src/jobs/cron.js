@@ -2,19 +2,20 @@
 const cron = require('node-cron');
 const prisma = require('../config/database');
 const { generateSnapshot } = require('../modules/leaderboard/leaderboard.service');
+const logger = require('../utils/logger');
 
 // Job 1: Generate Weekly Leaderboard Snapshot
 // Runs every Sunday at 23:59
 cron.schedule('59 23 * * 0', async () => {
   try {
-    console.log('Running weekly leaderboard snapshot...');
+    logger.info('Running weekly leaderboard snapshot...');
     const now = new Date();
     // Assuming a simple label like "Week 42 2023"
     const periodLabel = `Week ${getWeekNumber(now)} ${now.getFullYear()}`;
     await generateSnapshot('WEEKLY', periodLabel);
-    console.log(`Weekly snapshot created: ${periodLabel}`);
+    logger.info(`Weekly snapshot created: ${periodLabel}`);
   } catch (error) {
-    console.error('Error running weekly snapshot:', error);
+    logger.error('Error running weekly snapshot:', error);
   }
 });
 
@@ -27,4 +28,4 @@ function getWeekNumber(d) {
   return weekNo;
 }
 
-console.log('Cron jobs initialized');
+logger.info('Cron jobs initialized');

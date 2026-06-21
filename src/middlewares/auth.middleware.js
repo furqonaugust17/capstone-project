@@ -1,6 +1,8 @@
 'use strict';
 
 const { verifyAccessToken, verifyRefreshToken } = require('../utils/jwt');
+const { errorResponse } = require('../utils/response');
+const logger = require('../utils/logger');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
@@ -25,11 +27,8 @@ const authenticate = async (req, res, next) => {
     req.user = payload; // payload should contain at least { userId, role }
     next();
   } catch (error) {
-    console.error('❌ Authentication error:', error);
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid or expired token',
-    });
+    logger.error('❌ Authentication error:', error);
+    return res.status(401).json(errorResponse('Invalid or expired token', 401));
   }
 };
 

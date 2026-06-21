@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bima-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgres://user:password@postgres:5432/bima_db
+      - JWT_SECRET=your_jwt_secret_here
+      - REDIS_URL=redis://redis:6379
+      # Tambahkan env variabel lainnya di file .env yang di-load
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - bima-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: bima-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: bima_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - bima-postgres-data:/var/lib/postgresql/data
+    networks:
+      - bima-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: bima-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - bima-redis-data:/data
+    networks:
+      - bima-network
+
+volumes:
+  bima-postgres-data:
+  bima-redis-data:
+
+networks:
+  bima-network:
+    driver: bridge

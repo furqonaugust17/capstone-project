@@ -6,6 +6,7 @@ const { s3Client } = require('../config/cloudflare');
 const { env } = require('../config/env');
 
 const BUCKET_NAME = env.R2_BUCKET_NAME;
+const logger = require('./logger');
 
 /**
  * Upload a file buffer to Cloudflare R2
@@ -15,24 +16,18 @@ const BUCKET_NAME = env.R2_BUCKET_NAME;
  * @returns {Promise<string>} - The public URL of the uploaded file
  */
 const uploadToR2 = async (buffer, key, mimetype) => {
+  const command = new PutObjectCommand({
+    Bucket: env.R2_BUCKET_NAME,
+    Key: key,
+    Body: buffer,
+    ContentType: mimetype,
+  });
+
   try {
-    const upload = new Upload({
-      client: s3Client,
-      params: {
-        Bucket: BUCKET_NAME,
-        Key: key,
-        Body: buffer,
-        ContentType: mimetype,
-      },
-    });
-
-    await upload.done();
-
-    // Construct public URL: e.g., https://pub-xxxxxx.r2.dev/animals/thumbnails/1.png
-    const publicUrl = `${env.R2_PUBLIC_URL}/${key}`;
-    return publicUrl;
+    await s3Client.send(command);
+    return `${env.R2_PUBLIC_URL}/${key}`;
   } catch (error) {
-    console.error('❌ Error uploading to R2:', error);
+    logger.error('❌ Error uploading to R2:', error);
     throw new Error('Failed to upload file to storage');
   }
 };
@@ -42,17 +37,17 @@ const uploadToR2 = async (buffer, key, mimetype) => {
  * @param {string} key - The key (path) of the file to delete
  */
 const deleteFromR2 = async (key) => {
-  try {
-    const command = new DeleteObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: key,
-    });
+  const command = new DeleteObjectCommand({
+    Bucket: env.R2_BUCKET_NAME,
+    Key: key,
+  });
 
+  try {
     await s3Client.send(command);
-    console.log(`✅ Deleted file from R2: ${key}`);
+    logger.info(`✅ Deleted file from R2: ${key}`);
   } catch (error) {
-    console.error('❌ Error deleting from R2:', error);
-    throw new Error('Failed to delete file from storage');
+    logger.error('❌ Error deleting from R2:', error);
+    // Kita tidak throw error agar proses lain tidak terhenti hanya karena gagal hapus
   }
 };
 

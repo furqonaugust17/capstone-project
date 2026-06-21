@@ -3,11 +3,13 @@
 const { errorResponse } = require('../utils/response');
 const { z } = require('zod');
 
+const logger = require('../utils/logger');
+
 /**
  * Global Error Handler Middleware
  */
 const errorHandler = (err, req, res, next) => {
-  console.error('❌ [Error Middleware]:', err);
+  logger.error(`[Error Middleware] ${err.message}`, { stack: err.stack, method: req.method, url: req.url });
 
   // Handle Zod validation errors (400)
   if (err instanceof z.ZodError) {

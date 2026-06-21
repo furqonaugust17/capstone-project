@@ -2,6 +2,7 @@
 const animalService = require('./animal.service');
 const { createAnimalSchema, updateAnimalSchema } = require('./animal.validation');
 const { successResponse } = require('../../utils/response');
+const { clearCache } = require('../../config/redis');
 
 const index = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -18,17 +19,20 @@ const show = async (req, res) => {
 const store = async (req, res) => {
   const data = createAnimalSchema.parse(req.body);
   const animal = await animalService.createAnimal(data, req.files);
+  await clearCache('animals:*');
   res.status(201).json(successResponse(animal, 201, 'Animal created successfully'));
 };
 
 const update = async (req, res) => {
   const data = updateAnimalSchema.parse(req.body);
   const animal = await animalService.updateAnimal(req.params.id, data, req.files);
+  await clearCache('animals:*');
   res.status(200).json(successResponse(animal, 200, 'Animal updated successfully'));
 };
 
 const destroy = async (req, res) => {
   await animalService.deleteAnimal(req.params.id);
+  await clearCache('animals:*');
   res.status(200).json(successResponse(null, 200, 'Animal deleted successfully'));
 };
 

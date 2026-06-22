@@ -1,3 +1,4 @@
+import 'package:app/features/game_session/domain/entities/game_session_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -46,11 +47,38 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Riwayat Bermain'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(64),
+        child: AppBar(
+          backgroundColor: const Color(0xE6F8FAFD),
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          centerTitle: false,
+          title: const Text(
+            'RIWAYAT MENGGAMBAR KAMU',
+            style: TextStyle(
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
+              color: Color(0xFF4285F4),
+            ),
+          ),
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12, right: 4),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFFD3E3FD),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.arrow_back, color: Color(0xFF041E49), size: 20),
+                onPressed: () => context.pop(),
+              ),
+            ),
+          ),
+        ),
       ),
       body: BlocBuilder<HistoryCubit, HistoryState>(
         builder: (context, state) {
@@ -85,52 +113,119 @@ class _HistoryPageState extends State<HistoryPage> {
           }
 
           return RefreshIndicator(
-            onRefresh: () =>
-                context.read<HistoryCubit>().fetchHistory(refresh: true),
-            child: ListView.builder(
+            onRefresh: () => context.read<HistoryCubit>().fetchHistory(refresh: true),
+            child: GridView.builder(
               controller: _scrollController,
-              itemCount: state.hasReachedMax
-                  ? state.items.length
-                  : state.items.length + 1,
+              padding: const EdgeInsets.all(24),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 250,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 234 / 278,
+              ),
+              itemCount: state.hasReachedMax ? state.items.length : state.items.length + 1,
               itemBuilder: (context, index) {
                 if (index >= state.items.length) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 final item = state.items[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: AppColors.primary,
-                      child: Icon(Icons.star, color: AppColors.primary),
-                    ),
-                    title: Text(
-                      item.animalName ?? 'Hewan',
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      'Skor: ${item.gameScore} | Waktu: ${item.drawingDuration}d\n'
-                      '${DateFormat('dd MMM yyyy, HH:mm').format(item.startedAt.toLocal())}',
-                    ),
-                    isThreeLine: true,
-                    onTap: () {
-                      context.push('/history/${item.id}');
-                    },
-                  ),
-                );
+                return _buildHistoryCard(context, item);
               },
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildHistoryCard(BuildContext context, GameSessionEntity item) {
+    int stars = 0;
+    if (item.gameScore >= 80) {
+      stars = 3;
+    } else if (item.gameScore >= 50) {
+      stars = 2;
+    } else if (item.gameScore >= 20) {
+      stars = 1;
+    }
+
+    // Default formatting if intl locale hasn't been set up for 'id'
+    String formattedDate = DateFormat('dd MMMM yyyy').format(item.startedAt.toLocal());
+
+    return GestureDetector(
+      onTap: () {
+        context.push('/history/${item.id}');
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3F3FA),
+          borderRadius: BorderRadius.circular(25),
+        ),
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: item.imageUrl != null
+                          ? Image.network(
+                              item.imageUrl!,
+                              fit: BoxFit.cover,
+                            )
+                          : const Icon(Icons.image_not_supported, color: Colors.grey, size: 50),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(3, (index) {
+                        return Icon(
+                          Icons.star_rounded,
+                          color: index < stars ? const Color(0xFFFFC107) : Colors.grey.shade400,
+                          size: 24,
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              item.animalName ?? 'Hewan',
+              style: const TextStyle(
+                fontFamily: 'Plus Jakarta Sans',
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+                color: Colors.black,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              formattedDate,
+              style: const TextStyle(
+                fontFamily: 'Plus Jakarta Sans',
+                fontWeight: FontWeight.w400,
+                fontSize: 12,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

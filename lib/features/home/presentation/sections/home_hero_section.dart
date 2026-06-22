@@ -10,35 +10,31 @@ class HomeHeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 309,
-      top: 46,
-      width: 299,
+      left: 224,
+      top: 54,
+      width: 468,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'ANIDRAW',
+            'GAME EDUKASI\nMENGGAMBAR HEWAN',
             textAlign: TextAlign.center,
-            maxLines: 1,
-            style: const TextStyle(
-              fontFamily: 'PoetsenOne',
-              fontSize: 64,
-              color: Color(0xFF4285F4),
-              fontWeight: FontWeight.w400,
-              height: 38 / 64,
-              letterSpacing: 0.64, // 0.01em
+            maxLines: 2,
+            style: AppTextStyles.displayMedium.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w800,
+              height: 1.15,
+              letterSpacing: 0.32,
             ),
           ),
-          const SizedBox(height: 15),
+          SizedBox(height: AppSpacing.lg),
           Text(
             'Ayo belajar menggambar hewan lucu dengan\ncara yang menyenangkan!',
             textAlign: TextAlign.center,
             maxLines: 2,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: const Color(0xFF44474E),
               fontWeight: FontWeight.w500,
-              fontSize: 14,
-              height: 17 / 14,
+              height: 1.2,
             ),
           ),
         ],

@@ -17,25 +17,24 @@ class HomeProfileWidget extends StatelessWidget {
         if (state is Authenticated) {
           final user = state.user;
           return Container(
-            width: 163,
-            height: 55,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F3FA),
-              borderRadius: BorderRadius.circular(10),
+              color: Colors.white.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.25),
-                  blurRadius: 7.8,
-                  offset: const Offset(3, 4),
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 CircleAvatar(
-                  backgroundColor: const Color(0xFFD9D9D9),
-                  radius: 19,
+                  backgroundColor: AppColors.primary,
+                  radius: 20,
                   backgroundImage: user.avatarUrl != null
                       ? NetworkImage(user.avatarUrl!)
                       : null,
@@ -44,59 +43,52 @@ class HomeProfileWidget extends StatelessWidget {
                           user.displayName?.isNotEmpty == true
                               ? user.displayName![0].toUpperCase()
                               : user.username[0].toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.black54,
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         )
                       : null,
                 ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        user.displayName ?? user.username,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600, // SemiBold
-                          fontSize: 12,
-                          color: Colors.black,
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      user.displayName ?? user.username,
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textNavy,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.stars_rounded, // Coin/star substitute
-                            color: Colors.orange,
-                            size: 14,
+                        const SizedBox(width: 4),
+                        Text(
+                          '${user.totalPoint} Poin',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${user.totalPoint} point',
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w200, // ExtraLight
-                              fontSize: 10,
-                              color: Color(0xFF6B6868),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
+                const SizedBox(width: 16),
                 IconButton(
                   onPressed: () {
                     context.read<AuthBloc>().add(const AuthLogoutRequested());
                     context.go('/login');
                   },
-                  icon: const Icon(Icons.exit_to_app, color: Colors.black, size: 24),
+                  icon: const Icon(Icons.logout, color: Colors.redAccent),
+                  tooltip: 'Keluar',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),

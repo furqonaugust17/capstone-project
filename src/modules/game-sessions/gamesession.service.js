@@ -1,8 +1,16 @@
 'use strict';
 const prisma = require('../../config/database');
 const { checkAchievements } = require('../achievements/achievement.checker');
+const { uploadToR2 } = require('../../utils/cloudflare');
 
-const createSession = async (userId, data) => {
+const createSession = async (userId, data, file) => {
+  let imageUrl = null;
+  if (file) {
+    const fileExtension = file.originalname.split('.').pop();
+    const key = `sessions/${userId}/${Date.now()}.${fileExtension}`;
+    imageUrl = await uploadToR2(file.buffer, key, file.mimetype);
+  }
+
   // Use a Prisma transaction to ensure both operations succeed or fail together
   const sessionResult = await prisma.$transaction(async (tx) => {
     // 1. Create the game session
@@ -16,6 +24,7 @@ const createSession = async (userId, data) => {
         gameScore: data.gameScore,
         focusScore: data.focusScore,
         drawingDuration: data.drawingDuration,
+        imageUrl,
         startedAt: new Date(data.startedAt),
       },
     });

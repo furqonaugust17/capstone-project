@@ -103,6 +103,7 @@ model GameSession {
   gameScore       Int
   focusScore       Float?
   drawingDuration  Int
+  imageUrl         String?
   startedAt        DateTime
   finishedAt       DateTime @default(now())
   createdAt        DateTime @default(now())

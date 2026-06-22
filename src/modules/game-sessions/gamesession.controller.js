@@ -20,7 +20,7 @@ const show = async (req, res) => {
 const store = async (req, res) => {
   const userId = req.user.userId;
   const data = createSessionSchema.parse(req.body);
-  const session = await gameSessionService.createSession(userId, data);
+  const session = await gameSessionService.createSession(userId, data, req.file);
   res.status(201).json(successResponse(session, 201, 'Game session created successfully'));
 };
 

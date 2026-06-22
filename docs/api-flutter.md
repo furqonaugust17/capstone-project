@@ -247,27 +247,17 @@ Digunakan untuk menyimpan hasil dan riwayat permainan setiap kali pemain selesai
 ### Submit Game Result
 - **Method**: `POST /game-sessions`
 - **Auth**: ✅ Required
-- **Request Body**:
-  ```json
-  {
-    "animalId": "uuid-hewan-target",
-    "modelId": "uuid-ml-model-aktif",
-    "predictionLabel": "Cat",
-    "confidenceScore": 0.95,
-    "gameScore": 150,
-    "focusScore": 0.85,
-    "drawingDuration": 45,
-    "startedAt": "2026-06-12T10:30:00.000Z"
-  }
-  ```
-- **Validation**:
-  - `animalId`, `modelId`: UUID valid (wajib)
+- **Format**: `multipart/form-data`
+- **Fields**:
+  - `animalId`: UUID valid (wajib)
+  - `modelId`: UUID valid (wajib)
   - `predictionLabel`: string (wajib)
-  - `confidenceScore`: float 0.0 - 1.0
+  - `confidenceScore`: float 0.0 - 1.0 (wajib)
   - `gameScore`: integer (wajib)
-  - `focusScore`: float, opsional
+  - `focusScore`: float (opsional)
   - `drawingDuration`: integer dalam detik (wajib)
   - `startedAt`: ISO 8601 datetime (wajib)
+  - `file`: file image hasil gambar (opsional, max 2MB)
 - **Side Effects**:
   - Nilai `gameScore` otomatis ditambahkan ke `totalPoint` pada profil user.
   - `UserStatistic` (totalGames, highestScore, averageFocus, dll) diperbarui secara otomatis.
@@ -514,6 +504,7 @@ Digunakan untuk menampilkan peringkat pemain.
 | `gameScore` | int | Skor yang didapat |
 | `focusScore` | float? | Skor fokus (opsional) |
 | `drawingDuration` | int | Durasi menggambar (detik) |
+| `imageUrl` | string? | URL gambar hasil karya |
 | `startedAt` | datetime | Waktu mulai menggambar |
 | `finishedAt` | datetime | Waktu selesai (otomatis) |
 

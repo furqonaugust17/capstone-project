@@ -291,6 +291,7 @@ Submit ke endpoint POST /game-sessions
     "gameScore": 85,
     "focusScore": 0.72,
     "drawingDuration": 38,
+    "imageUrl": "https://...",
     "startedAt": "2026-06-12T10:29:00.000Z",
     "finishedAt": "2026-06-12T10:30:00.000Z",
     "createdAt": "2026-06-12T10:30:00.000Z",

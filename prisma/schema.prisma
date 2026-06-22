@@ -27,7 +27,6 @@ model User {
   gameSessions      GameSession[]
   userInventories   UserInventory[]
   purchaseHistories   PurchaseHistory[]
-  userAchievements    UserAchievement[]
   userStatistic       UserStatistic?
   learningProfiles    LearningProfile[]
 
@@ -176,41 +175,9 @@ model PurchaseHistory {
   @@map("purchase_histories")
 }
 
-enum TriggerType {
-  TOTAL_GAMES
-  TOTAL_SCORE
-  FOCUS_SCORE
-  SPECIFIC_ANIMAL
-}
 
-model Achievement {
-  id               String            @id @default(uuid())
-  name             String
-  description      String?
-  rewardPoint      Int
-  iconUrl          String?
-  triggerType      TriggerType
-  triggerValue     Int
-  isActive         Boolean           @default(true)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  userAchievements UserAchievement[]
 
-  @@map("achievements")
-}
 
-model UserAchievement {
-  id            String      @id @default(uuid())
-  userId        String
-  achievementId String
-  unlockedAt    DateTime    @default(now())
-
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, achievementId])
-  @@map("user_achievements")
-}
 
 model UserStatistic {
   userId           String   @id

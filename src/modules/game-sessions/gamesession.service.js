@@ -1,6 +1,5 @@
 'use strict';
 const prisma = require('../../config/database');
-const { checkAchievements } = require('../achievements/achievement.checker');
 const { uploadToR2 } = require('../../utils/cloudflare');
 
 const createSession = async (userId, data, file) => {
@@ -72,8 +71,7 @@ const createSession = async (userId, data, file) => {
       });
     }
 
-    // 4. Check achievements
-    await checkAchievements(userId, tx);
+
 
     return session;
   });

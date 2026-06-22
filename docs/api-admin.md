@@ -186,39 +186,7 @@ Manajemen item yang dijual di toko dalam game.
 
 ---
 
-## 6️⃣ Manage Achievements (`/api/achievements`)
-
-Manajemen pencapaian yang bisa diraih pemain.
-
-### List All Achievements
-- **Endpoint**: `GET /achievements`
-- **Auth**: Required
-
-### Create Achievement
-- **Endpoint**: `POST /achievements`
-- **Auth**: Required (Admin)
-- **Format**: `multipart/form-data`
-- **Fields**:
-  - `name` (text, wajib)
-  - `description` (text, opsional)
-  - `rewardPoint` (number, wajib)
-  - `triggerType` (text, wajib: `TOTAL_GAMES` / `TOTAL_SCORE` / `FOCUS_SCORE` / `SPECIFIC_ANIMAL`)
-  - `triggerValue` (number, wajib)
-  - `file` (file image untuk ikon, opsional)
-
-### Update Achievement
-- **Endpoint**: `PUT /achievements/:id`
-- **Auth**: Required (Admin)
-- **Format**: `multipart/form-data`
-- **Fields**: Sama seperti create, semua opsional. Tambahan field `isActive` (boolean).
-
-### Delete Achievement
-- **Endpoint**: `DELETE /achievements/:id`
-- **Auth**: Required (Admin)
-
----
-
-## 7️⃣ Manage Animal-Model Relationships (`/api/relationships`)
+## 6️⃣ Manage Animal-Model Relationships (`/api/relationships`)
 
 Manajemen mapping antara hewan dan ML Model.
 
@@ -254,7 +222,7 @@ Manajemen mapping antara hewan dan ML Model.
 
 ---
 
-## 8️⃣ Statistics Dashboard (`/api/statistics`)
+## 7️⃣ Statistics Dashboard (`/api/statistics`)
 
 Statistik dan overview performa aplikasi untuk admin.
 
@@ -275,7 +243,7 @@ Statistik dan overview performa aplikasi untuk admin.
 
 ---
 
-## 9️⃣ Leaderboard Management (`/api/leaderboards`)
+## 8️⃣ Leaderboard Management (`/api/leaderboards`)
 
 Manajemen leaderboard dan snapshot.
 
@@ -304,7 +272,7 @@ Manajemen leaderboard dan snapshot.
 
 ---
 
-## 🔟 Analytics Dashboard (`/api/analytics`)
+## 9️⃣ Analytics Dashboard (`/api/analytics`)
 
 Data analitik lanjutan untuk admin dashboard.
 

@@ -92,7 +92,6 @@ const relationshipRoutes = require('./modules/relationships/relationship.routes'
 const shopRoutes = require('./modules/shop/shop.routes');
 const purchaseRoutes = require('./modules/purchase/purchase.routes');
 const inventoryRoutes = require('./modules/inventory/inventory.routes');
-const achievementRoutes = require('./modules/achievements/achievement.routes');
 const leaderboardRoutes = require('./modules/leaderboard/leaderboard.routes');
 const analyticsRoutes = require('./modules/analytics/analytics.routes');
 
@@ -107,7 +106,6 @@ app.use('/api/relationships', relationshipRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/purchase', purchaseRoutes);
 app.use('/api/inventory', inventoryRoutes);
-app.use('/api/achievements', achievementRoutes);
 app.use('/api/leaderboards', leaderboardRoutes);
 app.use('/api/analytics', analyticsRoutes);
 

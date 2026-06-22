@@ -1,8 +1,8 @@
 const gameSessionService = require('../../src/modules/game-sessions/gamesession.service');
-const { checkAchievements } = require('../../src/modules/achievements/achievement.checker');
+const { uploadToR2 } = require('../../src/utils/cloudflare');
 
-jest.mock('../../src/modules/achievements/achievement.checker', () => ({
-  checkAchievements: jest.fn(),
+jest.mock('../../src/utils/cloudflare', () => ({
+  uploadToR2: jest.fn(),
 }));
 
 describe('Game Session Service', () => {
@@ -13,7 +13,7 @@ describe('Game Session Service', () => {
   });
 
   describe('createSession', () => {
-    it('should create a game session, update user points, create stats if absent, and check achievements', async () => {
+    it('should create a game session, update user points, create stats if absent', async () => {
       const data = {
         animalId: 'a1',
         modelId: 'm1',
@@ -25,28 +25,35 @@ describe('Game Session Service', () => {
         startedAt: '2023-10-10T10:00:00Z',
       };
       const userId = 'u1';
+      const file = {
+        originalname: 'test.png',
+        buffer: Buffer.from('test'),
+        mimetype: 'image/png'
+      };
 
-      prismaMock.gameSession.create.mockResolvedValue({ id: 'gs1', ...data });
+      uploadToR2.mockResolvedValue('https://example.com/test.png');
+      prismaMock.gameSession.create.mockResolvedValue({ id: 'gs1', ...data, imageUrl: 'https://example.com/test.png' });
       prismaMock.user.update.mockResolvedValue({});
       prismaMock.userStatistic.findUnique.mockResolvedValue(null); // Stat not present
       prismaMock.userStatistic.create.mockResolvedValue({});
 
-      const result = await gameSessionService.createSession(userId, data);
+      const result = await gameSessionService.createSession(userId, data, file);
 
       expect(result).toHaveProperty('id', 'gs1');
+      expect(uploadToR2).toHaveBeenCalledWith(file.buffer, expect.stringContaining(`sessions/${userId}/`), file.mimetype);
       expect(prismaMock.$transaction).toHaveBeenCalled();
       expect(prismaMock.gameSession.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ userId, animalId: data.animalId, gameScore: data.gameScore })
+        data: expect.objectContaining({ userId, animalId: data.animalId, gameScore: data.gameScore, imageUrl: 'https://example.com/test.png' })
       }));
       expect(prismaMock.user.update).toHaveBeenCalledWith({
         where: { id: userId },
         data: { totalPoint: { increment: 90 } },
       });
       expect(prismaMock.userStatistic.create).toHaveBeenCalled();
-      expect(checkAchievements).toHaveBeenCalledWith(userId, prismaMock);
+
     });
 
-    it('should update user stats if they already exist', async () => {
+    it('should update user stats if they already exist without file upload', async () => {
       const data = {
         animalId: 'a1',
         modelId: 'm1',
@@ -59,7 +66,7 @@ describe('Game Session Service', () => {
       };
       const userId = 'u1';
 
-      prismaMock.gameSession.create.mockResolvedValue({ id: 'gs1', ...data });
+      prismaMock.gameSession.create.mockResolvedValue({ id: 'gs1', ...data, imageUrl: null });
       prismaMock.user.update.mockResolvedValue({});
       
       const existingStat = {
@@ -73,8 +80,12 @@ describe('Game Session Service', () => {
       prismaMock.userStatistic.findUnique.mockResolvedValue(existingStat);
       prismaMock.userStatistic.update.mockResolvedValue({});
 
-      await gameSessionService.createSession(userId, data);
+      await gameSessionService.createSession(userId, data, null);
 
+      expect(uploadToR2).not.toHaveBeenCalled();
+      expect(prismaMock.gameSession.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ imageUrl: null })
+      }));
       expect(prismaMock.userStatistic.update).toHaveBeenCalledWith({
         where: { userId },
         data: {

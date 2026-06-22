@@ -297,43 +297,7 @@ PurchaseHistory
 
 ---
 
-# Achievement System
 
-## Achievement
-
-```text
-Achievement
-- id
-- name
-- description
-- reward_point
-```
-
-### Examples
-
-```text
-First Drawing
-
-Animal Expert
-
-Focus Master
-
-1000 Points Collector
-```
-
----
-
-## UserAchievement
-
-```text
-UserAchievement
-- id
-- user_id
-- achievement_id
-- unlocked_at
-```
-
----
 
 # User Statistics
 

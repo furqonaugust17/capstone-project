@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app/core/theme/app_spacing.dart';
 import 'package:app/core/theme/app_colors.dart';
 import 'package:app/core/theme/app_text_styles.dart';
-// imports kept minimal — radius not required in this section
+import 'package:app/features/animal/presentation/bloc/animal_bloc.dart';
+import 'package:app/features/animal/presentation/bloc/animal_event.dart';
+import 'package:app/features/animal/presentation/bloc/animal_state.dart';
 import 'package:app/features/choose/presentation/widgets/animal_pill.dart';
 
 class ChooseSceneSection extends StatelessWidget {
@@ -65,40 +68,80 @@ class ChooseSceneSection extends StatelessWidget {
               left: AppSpacing.xxl,
               right: AppSpacing.xxl,
               top: 120,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AnimalPill(
-                    label: 'Kucing',
-                    icon: Icons.pets,
-                    onTap: () =>
-                        context.push('/mode', extra: {'animal': 'Kucing'}),
-                  ),
-                  AnimalPill(
-                    label: 'Sapi',
-                    icon: Icons.grass,
-                    onTap: () =>
-                        context.push('/mode', extra: {'animal': 'Sapi'}),
-                  ),
-                  AnimalPill(
-                    label: 'Bebek',
-                    icon: Icons.water,
-                    onTap: () =>
-                        context.push('/mode', extra: {'animal': 'Bebek'}),
-                  ),
-                  AnimalPill(
-                    label: 'Ikan',
-                    icon: Icons.set_meal,
-                    onTap: () =>
-                        context.push('/mode', extra: {'animal': 'Ikan'}),
-                  ),
-                  AnimalPill(
-                    label: 'Lumba\nLumba',
-                    icon: Icons.pool,
-                    onTap: () =>
-                        context.push('/mode', extra: {'animal': 'Lumba-Lumba'}),
-                  ),
-                ],
+              bottom: 20,
+              child: BlocBuilder<AnimalBloc, AnimalState>(
+                builder: (context, state) {
+                  if (state is AnimalLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is AnimalError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            state.message,
+                            style: AppTextStyles.bodyLarge.copyWith(
+                              color: AppColors.error,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<AnimalBloc>().add(
+                                const LoadAnimals(),
+                              );
+                            },
+                            child: const Text('Coba Lagi'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (state is AnimalLoaded) {
+                    if (state.animals.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'Belum ada hewan yang tersedia.',
+                          style: AppTextStyles.bodyLarge,
+                        ),
+                      );
+                    }
+                    return Center(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: state.animals.map((animal) {
+                            // Simple icon mapping fallback (or use cached network image later)
+                            IconData animalIcon = Icons.pets;
+                            if (animal.name.toLowerCase() == 'sapi')
+                              animalIcon = Icons.grass;
+                            if (animal.name.toLowerCase() == 'bebek')
+                              animalIcon = Icons.water;
+                            if (animal.name.toLowerCase() == 'ikan')
+                              animalIcon = Icons.set_meal;
+                            if (animal.name.toLowerCase().contains('lumba'))
+                              animalIcon = Icons.pool;
+
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 16.0),
+                              child: AnimalPill(
+                                label: animal.name,
+                                icon: animalIcon,
+                                onTap: () => context.push(
+                                  '/mode',
+                                  extra: {'animal': animal},
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
             ),
           ],

@@ -78,15 +78,6 @@ class ResultImageCard extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              right: -10,
-              bottom: -12,
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.successTint,
-                child: const Icon(Icons.pets, color: AppColors.success),
-              ),
-            ),
           ],
         ),
       ),

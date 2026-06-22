@@ -11,11 +11,48 @@ import 'package:app/features/result/presentation/pages/result_page.dart';
 import 'package:app/features/home/presentation/pages/home_page.dart';
 import 'package:app/features/choose/presentation/pages/choose_animal_page.dart';
 import 'package:app/features/mode/presentation/pages/mode_page.dart';
+import 'package:app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:app/features/auth/presentation/pages/login_page.dart';
+import 'package:app/features/auth/presentation/pages/register_page.dart';
+import 'package:app/features/splash/presentation/pages/splash_page.dart';
+import 'package:app/features/game_session/presentation/bloc/submit/submit_game_cubit.dart';
+import 'package:app/features/game_session/presentation/bloc/history/history_cubit.dart';
+import 'package:app/features/game_session/presentation/bloc/detail/session_detail_cubit.dart';
+import 'package:app/features/game_session/presentation/pages/history_page.dart';
+import 'package:app/features/game_session/presentation/pages/session_detail_page.dart';
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
+    redirect: (context, state) {
+      final authState = context.read<AuthBloc>().state;
+      final isAuthenticated = authState is Authenticated;
+      final isAuthRoute = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register';
+      final isSplashRoute = state.matchedLocation == '/splash';
+
+      if (isSplashRoute) return null;
+      if (!isAuthenticated && !isAuthRoute) return '/login';
+      if (isAuthenticated && isAuthRoute) return '/';
+      return null;
+    },
     routes: <GoRoute>[
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashPage(),
+      ),
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterPage(),
+      ),
       GoRoute(
         path: '/',
         name: 'home',
@@ -31,18 +68,31 @@ class AppRouter {
             final width = extra['width'] as int?;
             final height = extra['height'] as int?;
             final similarityPercent = extra['similarityPercent'] as double?;
-            final selectedAnimal = extra['animal'] as String?;
+            final selectedAnimal = extra['animal'];
             final duration = extra['duration'] as int?;
-            return ResultPage(
-              imageBytes: bytes,
-              srcWidth: width,
-              srcHeight: height,
-              similarityPercent: similarityPercent,
-              selectedAnimal: selectedAnimal,
-              duration: duration,
+            final predictionLabel = extra['predictionLabel'] as String?;
+            final confidenceScore = extra['confidenceScore'] as double?;
+            final startedAt = extra['startedAt'] as DateTime?;
+
+            return BlocProvider(
+              create: (context) => di<SubmitGameCubit>(),
+              child: ResultPage(
+                imageBytes: bytes,
+                srcWidth: width,
+                srcHeight: height,
+                similarityPercent: similarityPercent,
+                selectedAnimal: selectedAnimal,
+                duration: duration,
+                predictionLabel: predictionLabel,
+                confidenceScore: confidenceScore,
+                startedAt: startedAt,
+              ),
             );
           }
-          return const ResultPage();
+          return BlocProvider(
+            create: (context) => di<SubmitGameCubit>(),
+            child: const ResultPage(),
+          );
         },
       ),
       GoRoute(
@@ -50,16 +100,17 @@ class AppRouter {
         name: 'drawing',
         builder: (context, state) {
           final extra = state.extra;
-          String? selectedAnimal;
+          dynamic selectedAnimal;
           String? drawingMode;
           if (extra is Map<String, dynamic>) {
-            selectedAnimal = extra['animal'] as String?;
+            selectedAnimal = extra['animal'];
             drawingMode = extra['mode'] as String?;
           }
           final controller = di<DrawingController>();
           final drawingCubit = di<DrawingCubit>(param1: controller);
           if (selectedAnimal != null) {
-            drawingCubit.setSelectedAnimal(selectedAnimal);
+            // we will extract name from entity in drawing page
+            drawingCubit.setSelectedAnimal(selectedAnimal.name);
           }
           return MultiBlocProvider(
             providers: [
@@ -67,7 +118,7 @@ class AppRouter {
               BlocProvider(create: (_) => di<ClassificationBloc>()),
             ],
             child: DrawingPage(
-              selectedAnimal: selectedAnimal,
+              selectedAnimalEntity: selectedAnimal, // Need to update DrawingPage to accept this
               drawingMode: drawingMode,
             ),
           );
@@ -83,12 +134,33 @@ class AppRouter {
         name: 'mode',
         builder: (context, state) {
           final extra = state.extra;
-          String? animal;
+          dynamic animal;
           if (extra is Map<String, dynamic>) {
-            animal = extra['animal'] as String?;
+            animal = extra['animal'];
           }
-          return ModePage(selectedAnimal: animal);
+          return ModePage(selectedAnimal: animal); // Pass the entity directly
         },
+      ),
+      GoRoute(
+        path: '/history',
+        name: 'history',
+        builder: (context, state) => BlocProvider(
+          create: (context) => di<HistoryCubit>(),
+          child: const HistoryPage(),
+        ),
+        routes: [
+          GoRoute(
+            path: ':id',
+            name: 'history_detail',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return BlocProvider(
+                create: (context) => di<SessionDetailCubit>(),
+                child: SessionDetailPage(sessionId: id),
+              );
+            },
+          ),
+        ],
       ),
     ],
     errorBuilder: (context, state) {

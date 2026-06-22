@@ -47,7 +47,7 @@ class ResultActionButtons extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [AppColors.primary, AppColors.primaryDark],
           ),
-          onPressed: () => context.go('/'),
+          onPressed: () => context.go('/choose'),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

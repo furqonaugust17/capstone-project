@@ -2,9 +2,14 @@ import 'package:app/core/database/app_database.dart';
 import 'package:app/core/ml/image_preprocessor.dart';
 import 'package:app/core/ml/tensor_converter.dart';
 import 'package:app/core/ml/tflite_service.dart';
+import 'package:app/features/drawing/injection.dart' as drawing_injection;
+import 'package:app/features/auth/injection.dart' as auth_injection;
 import 'package:app/features/classification/injection.dart'
     as classification_injection;
-import 'package:app/features/drawing/injection.dart' as drawing_injection;
+import 'package:app/features/animal/injection.dart' as animal_injection;
+import 'package:app/features/ml_model/injection.dart' as ml_model_injection;
+import 'package:app/features/splash/injection.dart' as splash_injection;
+import 'package:app/features/game_session/injection.dart' as game_session_injection;
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,9 +22,9 @@ Future<void> configureDependencies() async {
   di.registerLazySingleton<ImagePreprocessor>(() => const ImagePreprocessor());
   di.registerLazySingleton<TensorConverter>(() => const TensorConverter());
 
-  final tflite = TFLiteService();
-  await tflite.init();
-  di.registerSingleton<TFLiteService>(tflite);
+  // Register TFLiteService without init — SplashCubit will call
+  // initFromFile() (online model) or init() (bundled fallback).
+  di.registerSingleton<TFLiteService>(TFLiteService());
 
   // Local storage example (environment/settings)
   final prefs = await SharedPreferences.getInstance();
@@ -27,4 +32,9 @@ Future<void> configureDependencies() async {
 
   await classification_injection.initClassificationFeature(di);
   await drawing_injection.initDrawingFeature(di);
+  await auth_injection.initAuthFeature(di);
+  await animal_injection.initAnimalFeature(di);
+  await ml_model_injection.initMLModelFeature(di);
+  await splash_injection.initSplashFeature(di);
+  await game_session_injection.initGameSessionFeature(di);
 }

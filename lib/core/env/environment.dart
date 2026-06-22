@@ -8,14 +8,16 @@ class Environment {
 
   static const development = Environment._(
     flavor: Flavor.development,
-    apiBaseUrl: 'https://dev.example.com',
+    apiBaseUrl: 'http://10.0.2.2:3001/api', // Android emulator -> localhost
   );
   static const staging = Environment._(
     flavor: Flavor.staging,
-    apiBaseUrl: 'https://staging.example.com',
+    apiBaseUrl: 'http://<IP_SERVER>:3001/api',
   );
   static const production = Environment._(
     flavor: Flavor.production,
-    apiBaseUrl: 'https://api.example.com',
+    apiBaseUrl: 'https://api.example.com/api',
   );
+
+  static Environment current = development;
 }

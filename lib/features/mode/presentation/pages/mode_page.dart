@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:app/features/mode/presentation/sections/mode_scene_section.dart';
 
 class ModePage extends StatelessWidget {
-  final String? selectedAnimal;
+  final dynamic selectedAnimal;
 
   const ModePage({super.key, this.selectedAnimal});
 

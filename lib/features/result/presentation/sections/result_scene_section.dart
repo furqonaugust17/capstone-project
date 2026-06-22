@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import 'package:app/core/theme/app_colors.dart';
 import 'package:app/core/theme/app_dimensions.dart';
@@ -19,6 +20,7 @@ class ResultSceneSection extends StatelessWidget {
   final double? similarityPercent;
   final String? selectedAnimal;
   final int? duration;
+  final int? gameScore;
 
   const ResultSceneSection({
     super.key,
@@ -26,6 +28,7 @@ class ResultSceneSection extends StatelessWidget {
     this.similarityPercent,
     this.selectedAnimal,
     this.duration,
+    this.gameScore,
   });
 
   String _displayAnimalLabel() {
@@ -36,10 +39,39 @@ class ResultSceneSection extends StatelessWidget {
     return 'assets/images/result/cat_drawing.png';
   }
 
+  double _calculateRating(double similarity, int timeInSeconds) {
+    // Similarity weight: Max 2.8 stars
+    double baseScore = (similarity / 100.0) * 2.8;
+
+    // Time bonus weight: Max 0.2 stars
+    double timeBonus = 0.0;
+    if (timeInSeconds <= 15) {
+      timeBonus = 0.2;
+    } else if (timeInSeconds <= 60) {
+      // Scales down linearly from 0.2 to 0.0 between 15 and 60 seconds
+      timeBonus = 0.2 - ((timeInSeconds - 15) / 45.0) * 0.2;
+    }
+
+    // Clamp total score to [0.0, 3.0]
+    return (baseScore + timeBonus).clamp(0.0, 3.0);
+  }
+
   String _formatDuration(int totalSeconds) {
     final minutes = totalSeconds ~/ 60;
     final seconds = totalSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  String _getMotivationalMessage(double similarity, String animalLabel) {
+    if (similarity >= 80.0) {
+      return 'Hebat! Ini adalah $animalLabel yang sempurna!';
+    } else if (similarity >= 50.0) {
+      return 'Bagus sekali! Ini terlihat seperti $animalLabel!';
+    } else if (similarity >= 30.0) {
+      return 'Usaha yang bagus! Ayo coba gambar $animalLabel lagi!';
+    } else {
+      return 'Wah, unik sekali! Tetap semangat menggambar $animalLabel ya!';
+    }
   }
 
   @override
@@ -86,7 +118,7 @@ class ResultSceneSection extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    const ScoreBadge(score: '1,240'),
+                    ScoreBadge(score: gameScore != null ? gameScore.toString() : '...'),
                   ],
                 ),
               ),
@@ -116,10 +148,13 @@ class ResultSceneSection extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Hebat! Ini adalah $animalLabel!',
+                          _getMotivationalMessage(
+                            similarityPercent ?? 0.0,
+                            animalLabel,
+                          ),
                           textAlign: TextAlign.center,
                           style: AppTextStyles.displayMedium.copyWith(
-                            fontSize: 36,
+                            fontSize: 30,
                             height: 40 / 36,
                             letterSpacing: -0.9,
                             color: AppColors.textNavy,
@@ -127,17 +162,21 @@ class ResultSceneSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
-                        const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.star, color: AppColors.primary),
-                            SizedBox(width: AppSpacing.xs),
-                            Icon(Icons.star, color: AppColors.primary),
-                            SizedBox(width: AppSpacing.xs),
-                            Icon(Icons.star, color: AppColors.primary),
-                          ],
+                        RatingBarIndicator(
+                          rating: _calculateRating(
+                            similarityPercent ?? 0.0,
+                            duration ?? 0,
+                          ),
+                          itemBuilder: (context, index) =>
+                              const Icon(Icons.star, color: AppColors.primary),
+                          itemCount: 3,
+                          itemSize: 40.0,
+                          unratedColor: AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          direction: Axis.horizontal,
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
                             Expanded(
@@ -152,7 +191,7 @@ class ResultSceneSection extends StatelessWidget {
                                 iconBackground: AppColors.secondary,
                               ),
                             ),
-                            const SizedBox(width: AppSpacing.lg),
+                            const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: ResultStatCard(
                                 title: 'WAKTU',
@@ -167,7 +206,7 @@ class ResultSceneSection extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.sm),
                         const ResultActionButtons(),
                       ],
                     ),

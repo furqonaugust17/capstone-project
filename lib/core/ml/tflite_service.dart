@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:math' as math;
 
@@ -87,6 +88,56 @@ class TFLiteService {
     }
   }
 
+  Future<void> initFromFile(String filePath, {List<String>? labels}) async {
+    if (isInitialized) {
+      dispose();
+    }
+
+    try {
+      final file = File(filePath);
+      if (!await file.exists()) {
+        throw TFLiteServiceException(
+          'Model file not found at: $filePath',
+        );
+      }
+
+      final fileSize = await file.length();
+      print('TFLiteService.initFromFile: Loading $filePath ($fileSize bytes)');
+
+      if (fileSize < 1024) {
+        throw TFLiteServiceException(
+          'Model file is too small ($fileSize bytes). File may be corrupted or not a valid TFLite model.',
+        );
+      }
+
+      final options = InterpreterOptions()..threads = threads;
+      
+      // Read file into memory buffer to avoid MMAP issues on Android
+      final fileBytes = await file.readAsBytes();
+      print('TFLiteService.initFromFile: Read ${fileBytes.length} bytes into memory');
+      
+      _interpreter = Interpreter.fromBuffer(fileBytes, options: options);
+      _interpreter!.allocateTensors();
+      
+      if (labels != null && labels.isNotEmpty) {
+        _labels = labels;
+      } else {
+        _labels = await _loadLabels(labelsAssetPath);
+      }
+      _isInitialized = true;
+
+      try {
+        print('TFLiteService.initFromFile: SUCCESS inputShape=$inputShape, outputShape=$outputShape');
+      } catch (_) {}
+    } catch (error) {
+      print('TFLiteService.initFromFile: FAILED with error: $error');
+      throw TFLiteServiceException(
+        'Interpreter initialization from file failed.',
+        cause: error,
+      );
+    }
+  }
+
   Future<List<String>> _loadLabels(String path) async {
     final raw = await rootBundle.loadString(path);
     final lines = raw
@@ -128,10 +179,7 @@ class TFLiteService {
       outputElements *= d;
     }
 
-    // ── Flatten the input into a raw ByteBuffer ──
-    // The interpreter's setTo() has a fast path for Uint8List / ByteBuffer
-    // that avoids all the nested-list type juggling which causes
-    // "List<double> is not a subtype of Float32List" errors.
+    // ── Flatten the input into Float32List first ──
     final Float32List flatInput;
     if (inputTensor is Float32List) {
       flatInput = inputTensor;
@@ -165,12 +213,26 @@ class TFLiteService {
       );
     }
 
-    // Use the raw byte buffer so the interpreter copies bytes directly
-    // via TfLiteTensorCopyFromBuffer (no Dart list type conversion).
-    final inputBytes = flatInput.buffer.asUint8List();
+    // ── Detect model tensor type and prepare matching buffers ──
+    final inTensor = interpreter.getInputTensor(0);
+    final outTensor = interpreter.getOutputTensor(0);
+    final expectedInputBytes = inTensor.numBytes();
+    final expectedOutputBytes = outTensor.numBytes();
+    final isQuantized = (expectedInputBytes == inputElements); // uint8: 1 byte/element
 
-    // ── Prepare output buffer as raw bytes ──
-    final outputBytes = Uint8List(outputElements * 4); // float32 = 4 bytes
+    Uint8List inputBytes;
+    if (isQuantized) {
+      // Model expects uint8 input: convert float [0.0-1.0] → uint8 [0-255]
+      inputBytes = Uint8List(inputElements);
+      for (var i = 0; i < inputElements; i++) {
+        inputBytes[i] = (flatInput[i] * 255.0).clamp(0.0, 255.0).toInt();
+      }
+    } else {
+      // Model expects float32 input: use raw bytes directly
+      inputBytes = flatInput.buffer.asUint8List();
+    }
+
+    final outputBytes = Uint8List(expectedOutputBytes);
 
     // Debug logging.
     try {
@@ -178,7 +240,12 @@ class TFLiteService {
         'TFLiteService.runInference: '
         'inputElements=$inputElements, '
         'outputElements=$outputElements, '
-        'expectedInputShape=$inputTensorShape',
+        'isQuantized=$isQuantized, '
+        'inputBytes=${inputBytes.length}, '
+        'expectedInputBytes=$expectedInputBytes, '
+        'expectedOutputBytes=$expectedOutputBytes, '
+        'inputType=${inTensor.type}, '
+        'outputType=${outTensor.type}',
       );
     } catch (_) {}
 
@@ -188,13 +255,24 @@ class TFLiteService {
       interpreter.run(inputBytes, outputBytes);
       stopwatch.stop();
 
-      // Decode output bytes back to float32 scores.
-      final outputFloats = outputBytes.buffer.asFloat32List();
-      final scores = List<double>.generate(
-        outputFloats.length,
-        (i) => outputFloats[i].toDouble(),
-        growable: false,
-      );
+      // Decode output based on model type
+      List<double> scores;
+      if (isQuantized) {
+        // uint8 output: dequantize [0-255] → [0.0-1.0]
+        scores = List<double>.generate(
+          outputElements,
+          (i) => outputBytes[i] / 255.0,
+          growable: false,
+        );
+      } else {
+        // float32 output
+        final outputFloats = outputBytes.buffer.asFloat32List();
+        scores = List<double>.generate(
+          outputFloats.length,
+          (i) => outputFloats[i].toDouble(),
+          growable: false,
+        );
+      }
 
       return InferenceOutput(
         scores: scores,

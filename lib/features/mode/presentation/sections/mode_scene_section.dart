@@ -6,7 +6,7 @@ import 'package:app/core/theme/app_text_styles.dart';
 import 'package:app/features/mode/presentation/widgets/mode_pill.dart';
 
 class ModeSceneSection extends StatelessWidget {
-  final String? selectedAnimal;
+  final dynamic selectedAnimal;
 
   const ModeSceneSection({super.key, this.selectedAnimal});
 

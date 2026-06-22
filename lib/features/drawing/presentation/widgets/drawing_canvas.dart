@@ -42,37 +42,23 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      key: _repaintKey,
-      child: ValueListenableBuilder<Brush>(
-        valueListenable: widget.controller.brushNotifier,
-        builder: (context, brush, _) {
-          return AnimatedBuilder(
-            animation: widget.controller.repaint,
-            builder: (context, _) {
-              return SizedBox.expand(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Container(color: widget.backgroundColor),
-                    if (widget.traceAssetPath != null)
-                      IgnorePointer(
-                        child: Center(
-                          child: Opacity(
-                            opacity: widget.traceOpacity,
-                            child: FractionallySizedBox(
-                              widthFactor: 1.2,
-                              heightFactor: 1.2,
-                              child: Image.asset(
-                                widget.traceAssetPath!,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    // Custom drawing surface: capture gestures and paint strokes
-                    GestureDetector(
+    return ValueListenableBuilder<Brush>(
+      valueListenable: widget.controller.brushNotifier,
+      builder: (context, brush, _) {
+        return AnimatedBuilder(
+          animation: widget.controller.repaint,
+          builder: (context, _) {
+            return SizedBox.expand(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // 1) RepaintBoundary wraps ONLY the drawing surface
+                  //    (background + strokes) so captureImage() never
+                  //    includes the trace overlay.
+                  RepaintBoundary(
+                    key: _repaintKey,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onPanStart: (details) {
                         widget.controller.startStroke(details.localPosition);
                       },
@@ -82,22 +68,49 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                       onPanEnd: (details) {
                         widget.controller.endStroke();
                       },
-                      child: CustomPaint(
-                        painter: SketchPainter(
-                          strokes: widget.controller.strokes.value,
-                          currentStroke: widget.controller.current.value,
-                          repaint: widget.controller.repaint,
-                        ),
-                        size: Size.infinite,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Container(color: widget.backgroundColor),
+                          CustomPaint(
+                            painter: SketchPainter(
+                              strokes: widget.controller.strokes.value,
+                              currentStroke: widget.controller.current.value,
+                              repaint: widget.controller.repaint,
+                            ),
+                            size: Size.infinite,
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ),
+                  ),
+
+                  // 2) Trace image layer — rendered ON TOP of the drawing
+                  //    surface so the child can see the guide, but OUTSIDE
+                  //    RepaintBoundary so it is excluded from capture.
+                  //    IgnorePointer ensures it doesn't block drawing gestures.
+                  if (widget.traceAssetPath != null)
+                    IgnorePointer(
+                      child: Center(
+                        child: Opacity(
+                          opacity: widget.traceOpacity,
+                          child: FractionallySizedBox(
+                            widthFactor: 1.2,
+                            heightFactor: 1.2,
+                            child: Image.asset(
+                              widget.traceAssetPath!,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

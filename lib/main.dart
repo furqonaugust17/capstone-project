@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_event.dart';
 import 'injection/injection.dart';
 import 'routes/app_router.dart';
 import 'core/theme/app_theme.dart';
@@ -20,11 +23,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = AppRouter.router;
-    return MaterialApp.router(
-      title: 'Educational Animal Drawing',
-      theme: AppTheme.light(),
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
+    return BlocProvider<AuthBloc>(
+      create: (_) => di<AuthBloc>()..add(const AuthCheckRequested()),
+      child: MaterialApp.router(
+        title: 'Educational Animal Drawing',
+        theme: AppTheme.light(),
+        routerConfig: router,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+docs/task*
+docs/api-flutter.md
+docs/focus_recovery_and_adaptive_assistance.md

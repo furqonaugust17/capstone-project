@@ -3,11 +3,9 @@ import 'package:go_router/go_router.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final List<Widget>? actions;
 
-  const CustomAppBar({
-    super.key,
-    required this.title,
-  });
+  const CustomAppBar({super.key, required this.title, this.actions});
 
   @override
   Widget build(BuildContext context) {
@@ -24,35 +22,38 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFD3E3FD),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Color(0xFF041E49),
-                        size: 16,
-                      ),
-                    ),
+              GestureDetector(
+                onTap: () => context.pop(),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFD3E3FD),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(width: 16),
-                ],
-              ),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: FontWeight.w800,
-                  fontSize: 20,
-                  color: Color(0xFF4285F4),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: Color(0xFF041E49),
+                    size: 16,
+                  ),
                 ),
               ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: FontWeight.w800,
+                    fontSize: 20,
+                    color: Color(0xFF4285F4),
+                  ),
+                ),
+              ),
+              if (actions != null) ...[
+                const SizedBox(width: 16),
+                ...actions!,
+              ],
             ],
           ),
         ),

@@ -21,7 +21,8 @@ class PurchaseRemoteDataSourceImpl implements PurchaseRemoteDataSource {
 
       final apiResponse = ApiResponse<PurchaseHistoryModel>.fromJson(
         response.data,
-        (json) => PurchaseHistoryModel.fromJson(json as Map<String, dynamic>),
+        (json) => PurchaseHistoryModel.fromJson(
+            (json as Map<String, dynamic>)['purchaseHistory'] as Map<String, dynamic>),
       );
 
       if (apiResponse.data == null) {

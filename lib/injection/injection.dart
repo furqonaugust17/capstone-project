@@ -10,6 +10,8 @@ import 'package:app/features/animal/injection.dart' as animal_injection;
 import 'package:app/features/ml_model/injection.dart' as ml_model_injection;
 import 'package:app/features/splash/injection.dart' as splash_injection;
 import 'package:app/features/game_session/injection.dart' as game_session_injection;
+import 'package:app/features/leaderboard/injection.dart' as leaderboard_injection;
+import 'package:app/features/statistics/injection.dart' as statistics_injection;
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,4 +39,6 @@ Future<void> configureDependencies() async {
   await ml_model_injection.initMLModelFeature(di);
   await splash_injection.initSplashFeature(di);
   await game_session_injection.initGameSessionFeature(di);
+  await leaderboard_injection.initLeaderboardFeature(di);
+  await statistics_injection.initStatisticsFeature(di);
 }

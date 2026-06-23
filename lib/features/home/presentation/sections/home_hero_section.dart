@@ -17,7 +17,7 @@ class HomeHeroSection extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'GAME EDUKASI\nMENGGAMBAR HEWAN',
+            'ANIDRAW',
             textAlign: TextAlign.center,
             maxLines: 2,
             style: AppTextStyles.displayMedium.copyWith(
@@ -25,6 +25,7 @@ class HomeHeroSection extends StatelessWidget {
               fontWeight: FontWeight.w800,
               height: 1.15,
               letterSpacing: 0.32,
+            fontFamily: 'PoetsenOne'
             ),
           ),
           SizedBox(height: AppSpacing.lg),

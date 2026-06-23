@@ -8,7 +8,9 @@ part 'purchase_history_model.g.dart';
 class PurchaseHistoryModel {
   final String id;
   final String userId;
+  @JsonKey(name: 'itemId')
   final String shopItemId;
+  @JsonKey(name: 'price')
   final int priceAtPurchase;
   final DateTime purchasedAt;
   final ShopItemModel? shopItem;

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:app/core/theme/app_colors.dart';
 import 'package:app/injection/injection.dart';
 import 'package:app/features/animal/presentation/bloc/animal_bloc.dart';
 import 'package:app/features/animal/presentation/bloc/animal_event.dart';
 import 'package:app/features/choose/presentation/sections/choose_scene_section.dart';
+
+import 'package:app/shared/widgets/custom_app_bar.dart';
 
 class ChooseAnimalPage extends StatelessWidget {
   const ChooseAnimalPage({super.key});
@@ -15,12 +16,11 @@ class ChooseAnimalPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => di<AnimalBloc>()..add(const LoadAnimals()),
       child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: const ChooseSceneSection(),
-          ),
+        appBar: const CustomAppBar(title: 'HEWAN'),
+        backgroundColor: Colors.white,
+        body: Padding(
+          padding: const EdgeInsets.only(top: 24),
+          child: Center(child: ChooseSceneSection()),
         ),
       ),
     );

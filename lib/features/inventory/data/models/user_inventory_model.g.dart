@@ -10,7 +10,7 @@ UserInventoryModel _$UserInventoryModelFromJson(Map<String, dynamic> json) =>
     UserInventoryModel(
       id: json['id'] as String,
       userId: json['userId'] as String,
-      shopItemId: json['shopItemId'] as String,
+      shopItemId: json['itemId'] as String,
       acquiredAt: DateTime.parse(json['acquiredAt'] as String),
       shopItem: json['shopItem'] == null
           ? null
@@ -21,7 +21,7 @@ Map<String, dynamic> _$UserInventoryModelToJson(UserInventoryModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,
-      'shopItemId': instance.shopItemId,
+      'itemId': instance.shopItemId,
       'acquiredAt': instance.acquiredAt.toIso8601String(),
       'shopItem': instance.shopItem,
     };

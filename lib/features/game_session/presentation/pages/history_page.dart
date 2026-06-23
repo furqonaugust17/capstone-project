@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
-import 'package:app/core/theme/app_colors.dart';
 import 'package:app/core/theme/app_text_styles.dart';
 import '../bloc/history/history_cubit.dart';
 
@@ -85,7 +83,8 @@ class _HistoryPageState extends State<HistoryPage> {
           }
 
           return RefreshIndicator(
-            onRefresh: () => context.read<HistoryCubit>().fetchHistory(refresh: true),
+            onRefresh: () =>
+                context.read<HistoryCubit>().fetchHistory(refresh: true),
             child: GridView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.all(24),
@@ -95,7 +94,9 @@ class _HistoryPageState extends State<HistoryPage> {
                 crossAxisSpacing: 16,
                 childAspectRatio: 234 / 278,
               ),
-              itemCount: state.hasReachedMax ? state.items.length : state.items.length + 1,
+              itemCount: state.hasReachedMax
+                  ? state.items.length
+                  : state.items.length + 1,
               itemBuilder: (context, index) {
                 if (index >= state.items.length) {
                   return const Center(child: CircularProgressIndicator());
@@ -112,27 +113,27 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   double _calculateRating(double similarity, int timeInSeconds) {
-    // Similarity weight: Max 2.8 stars
     double baseScore = (similarity / 100.0) * 2.8;
 
-    // Time bonus weight: Max 0.2 stars
     double timeBonus = 0.0;
     if (timeInSeconds <= 15) {
       timeBonus = 0.2;
     } else if (timeInSeconds <= 60) {
-      // Scales down linearly from 0.2 to 0.0 between 15 and 60 seconds
       timeBonus = 0.2 - ((timeInSeconds - 15) / 45.0) * 0.2;
     }
 
-    // Clamp total score to [0.0, 3.0]
     return (baseScore + timeBonus).clamp(0.0, 3.0);
   }
 
   Widget _buildHistoryCard(BuildContext context, GameSessionEntity item) {
-    double stars = _calculateRating(item.confidenceScore * 100, item.drawingDuration);
+    double stars = _calculateRating(
+      item.confidenceScore * 100,
+      item.drawingDuration,
+    );
 
-    // Default formatting if intl locale hasn't been set up for 'id'
-    String formattedDate = DateFormat('dd MMMM yyyy').format(item.startedAt.toLocal());
+    String formattedDate = DateFormat(
+      'dd MMMM yyyy',
+    ).format(item.startedAt.toLocal());
 
     return GestureDetector(
       onTap: () {
@@ -160,11 +161,12 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: item.imageUrl != null
-                          ? Image.network(
-                              item.imageUrl!,
-                              fit: BoxFit.cover,
-                            )
-                          : const Icon(Icons.image_not_supported, color: Colors.grey, size: 50),
+                          ? Image.network(item.imageUrl!, fit: BoxFit.cover)
+                          : const Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey,
+                              size: 50,
+                            ),
                     ),
                   ),
                   Positioned(

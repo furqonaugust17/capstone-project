@@ -23,7 +23,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GestureDetector(
-                onTap: () => context.pop(),
+                onTap: () => context.canPop() ? context.pop() : context.go("/"),
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: const BoxDecoration(

@@ -11,8 +11,8 @@ PurchaseHistoryModel _$PurchaseHistoryModelFromJson(
 ) => PurchaseHistoryModel(
   id: json['id'] as String,
   userId: json['userId'] as String,
-  shopItemId: json['shopItemId'] as String,
-  priceAtPurchase: (json['priceAtPurchase'] as num).toInt(),
+  shopItemId: json['itemId'] as String,
+  priceAtPurchase: (json['price'] as num).toInt(),
   purchasedAt: DateTime.parse(json['purchasedAt'] as String),
   shopItem: json['shopItem'] == null
       ? null
@@ -24,8 +24,8 @@ Map<String, dynamic> _$PurchaseHistoryModelToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'userId': instance.userId,
-  'shopItemId': instance.shopItemId,
-  'priceAtPurchase': instance.priceAtPurchase,
+  'itemId': instance.shopItemId,
+  'price': instance.priceAtPurchase,
   'purchasedAt': instance.purchasedAt.toIso8601String(),
   'shopItem': instance.shopItem,
 };

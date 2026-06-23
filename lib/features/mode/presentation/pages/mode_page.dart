@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:app/features/mode/presentation/sections/mode_scene_section.dart';
 
+import 'package:app/shared/widgets/custom_app_bar.dart';
+
 class ModePage extends StatelessWidget {
   final dynamic selectedAnimal;
 
@@ -8,20 +10,12 @@ class ModePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use a fixed artboard size and FittedBox for responsiveness (matches other pages)
-    const artboardWidth = 917.0;
-    const artboardHeight = 412.0;
-
     return Scaffold(
-      body: Center(
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: SizedBox(
-            width: artboardWidth,
-            height: artboardHeight,
-            child: ModeSceneSection(selectedAnimal: selectedAnimal),
-          ),
-        ),
+      backgroundColor: Colors.white,
+      appBar: const CustomAppBar(title: 'MODE'),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 24),
+        child: Center(child: ModeSceneSection(selectedAnimal: selectedAnimal)),
       ),
     );
   }

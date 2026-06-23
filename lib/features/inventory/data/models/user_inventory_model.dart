@@ -8,6 +8,7 @@ part 'user_inventory_model.g.dart';
 class UserInventoryModel {
   final String id;
   final String userId;
+  @JsonKey(name: 'itemId')
   final String shopItemId;
   final DateTime acquiredAt;
   final ShopItemModel? shopItem;

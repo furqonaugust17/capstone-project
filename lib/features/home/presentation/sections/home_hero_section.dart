@@ -44,7 +44,8 @@ class HomeHeroSection extends StatelessWidget {
           HomeStartButton(onPressed: () => onStartPressed()),
           SizedBox(height: 24),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            spacing: 11,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               GestureDetector(
                 onTap: () => context.push('/history'),
@@ -65,7 +66,7 @@ class HomeHeroSection extends StatelessWidget {
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.collections, color: Colors.blue, size: 20),
+                        child: const Icon(Icons.collections, color: Colors.blue, size: 24),
                       ),
                       Text('Galeri', style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
                     ],
@@ -91,7 +92,7 @@ class HomeHeroSection extends StatelessWidget {
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.leaderboard, color: Color(0xFFFFD900), size: 20),
+                        child: const Icon(Icons.leaderboard, color: Color(0xFFFFD900), size: 24),
                       ),
                       Text('Peringkat', style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
                     ],
@@ -117,7 +118,7 @@ class HomeHeroSection extends StatelessWidget {
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.store, color: Color(0xFFF29D38), size: 20),
+                        child: const Icon(Icons.store, color: Color(0xFFF29D38), size: 24),
                       ),
                       Text('Toko', style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
                     ],

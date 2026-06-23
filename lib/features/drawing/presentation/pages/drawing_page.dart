@@ -9,7 +9,7 @@ import 'package:app/features/classification/presentation/bloc/classification_blo
 import 'package:app/features/drawing/presentation/bloc/focus/focus_cubit.dart';
 
 import '../widgets/drawing_canvas.dart';
-import '../widgets/drawing_header.dart';
+import 'package:app/shared/widgets/custom_app_bar.dart';
 import '../../domain/entities/brush.dart';
 import '../widgets/drawing_bottom_controls.dart';
 import '../widgets/drawing_finish_button.dart';
@@ -135,13 +135,47 @@ class _DrawingPageState extends State<DrawingPage> {
       child: Builder(
         builder: (focusContext) {
           return Scaffold(
-            appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(72),
-              child: DrawingHeader(
-                title: 'Ayo Gambar ${widget.selectedAnimalEntity?.name ?? 'Kucing'}!',
-                onBack: () => Navigator.maybePop(context),
-                onExample: _showExampleDialog,
-              ),
+            appBar: CustomAppBar(
+              title: 'Ayo Gambar ${widget.selectedAnimalEntity?.name ?? 'Kucing'}!',
+              actions: [
+                GestureDetector(
+                  onTap: _showExampleDialog,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16, // AppSpacing.md
+                      vertical: 4,  // AppSpacing.xs
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3F3FA), // AppColors.surface
+                      borderRadius: BorderRadius.circular(24), // AppRadius.xl
+                      border: Border.all(color: const Color(0xFFE0E0E0)), // AppColors.border
+                    ),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 14,
+                          backgroundColor: Color(0xFF4285F4), // AppColors.primary
+                          child: Icon(
+                            Icons.pets,
+                            color: Colors.white, // AppColors.textOnPrimary
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 8), // AppSpacing.sm
+                        const Text(
+                          'CONTOH',
+                          style: TextStyle(
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: Color(0xFF4285F4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
             body: BlocListener<FocusCubit, FocusState>(
               listener: (ctx, focusState) {

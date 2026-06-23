@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../bloc/leaderboard_cubit.dart';
@@ -87,7 +86,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                 if (topThree.length > 1)
                                   SizedBox(
                                     width: 101,
-                                    height: 229,
+                                    height: 260,
                                     child: _buildPodium(
                                       topThree[1],
                                       2,
@@ -95,7 +94,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                     ),
                                   )
                                 else
-                                  const SizedBox(width: 101, height: 229),
+                                  const SizedBox(width: 101, height: 260),
 
                                 const SizedBox(width: 15),
 
@@ -103,7 +102,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                 if (topThree.isNotEmpty)
                                   SizedBox(
                                     width: 101,
-                                    height: 288,
+                                    height: 290,
                                     child: _buildPodium(
                                       topThree[0],
                                       1,
@@ -111,7 +110,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                     ),
                                   )
                                 else
-                                  const SizedBox(width: 101, height: 288),
+                                  const SizedBox(width: 101, height: 290),
 
                                 const SizedBox(width: 15),
 
@@ -119,7 +118,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                 if (topThree.length > 2)
                                   SizedBox(
                                     width: 101,
-                                    height: 202,
+                                    height: 235,
                                     child: _buildPodium(
                                       topThree[2],
                                       3,
@@ -127,7 +126,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                     ),
                                   )
                                 else
-                                  const SizedBox(width: 101, height: 202),
+                                  const SizedBox(width: 101, height: 235),
                               ],
                             ),
                           ),
@@ -139,7 +138,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                               bottom: 0,
                               child: Container(
                                 width: 429,
-                                height: 95,
+                                padding: EdgeInsets.symmetric(vertical: 10),
                                 decoration: const BoxDecoration(
                                   color: Color(0xFFD3E3FD),
                                   borderRadius: BorderRadius.only(
@@ -280,28 +279,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                   ),
                 ),
         ),
-        const SizedBox(height: 3),
-        Text(
-          entry.displayName,
-          style: const TextStyle(
-            fontFamily: 'Plus Jakarta Sans',
-            fontWeight: FontWeight.w800,
-            fontSize: 16,
-            color: Colors.black,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        Text(
-          NumberFormat('#,###').format(entry.totalScore),
-          style: const TextStyle(
-            fontFamily: 'Plus Jakarta Sans',
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 5),
         Expanded(
           child: Container(
             width: 101,
@@ -316,6 +293,30 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 left: BorderSide(color: borderColor, width: 5),
                 right: BorderSide(color: borderColor, width: 5),
               ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  entry.displayName,
+                  style: const TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  NumberFormat('#,###').format(entry.totalScore),
+                  style: const TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

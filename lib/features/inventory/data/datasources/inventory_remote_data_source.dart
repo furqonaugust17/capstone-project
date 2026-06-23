@@ -5,6 +5,7 @@ import '../../../../core/network/utils/network_error_handler.dart';
 import '../../../../core/network/exceptions/network_exception.dart';
 import '../models/user_inventory_model.dart';
 import '../../../purchase/data/models/purchase_history_model.dart';
+import '../../../../core/network/models/paginated_response.dart';
 
 abstract class InventoryRemoteDataSource {
   Future<List<UserInventoryModel>> getMyInventory();
@@ -21,18 +22,19 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
     try {
       final response = await _apiClient.dio.get('/inventory');
 
-      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+      final apiResponse = ApiResponse<PaginatedResponse<UserInventoryModel>>.fromJson(
         response.data,
-        (json) => json as List<dynamic>,
+        (json) => PaginatedResponse<UserInventoryModel>.fromJson(
+          json as Map<String, dynamic>,
+          (itemJson) => UserInventoryModel.fromJson(itemJson as Map<String, dynamic>),
+        ),
       );
 
       if (apiResponse.data == null) {
         throw const UnknownNetworkException('Failed to fetch inventory: Data is null');
       }
 
-      return apiResponse.data!
-          .map((json) => UserInventoryModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      return apiResponse.data!.data;
     } on DioException catch (e) {
       throw NetworkErrorHandler.handle(e);
     } catch (e) {
@@ -45,18 +47,19 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
     try {
       final response = await _apiClient.dio.get('/inventory/history');
 
-      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+      final apiResponse = ApiResponse<PaginatedResponse<PurchaseHistoryModel>>.fromJson(
         response.data,
-        (json) => json as List<dynamic>,
+        (json) => PaginatedResponse<PurchaseHistoryModel>.fromJson(
+          json as Map<String, dynamic>,
+          (itemJson) => PurchaseHistoryModel.fromJson(itemJson as Map<String, dynamic>),
+        ),
       );
 
       if (apiResponse.data == null) {
         throw const UnknownNetworkException('Failed to fetch purchase history: Data is null');
       }
 
-      return apiResponse.data!
-          .map((json) => PurchaseHistoryModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      return apiResponse.data!.data;
     } on DioException catch (e) {
       throw NetworkErrorHandler.handle(e);
     } catch (e) {

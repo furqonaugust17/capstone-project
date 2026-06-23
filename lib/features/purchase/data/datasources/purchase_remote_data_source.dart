@@ -31,8 +31,8 @@ class PurchaseRemoteDataSourceImpl implements PurchaseRemoteDataSource {
       return apiResponse.data!;
     } on DioException catch (e) {
       if (e.response?.statusCode == 400) {
-        throw NetworkException(
-            message: e.response?.data['message'] ?? 'Poin tidak cukup',
+        throw UnknownNetworkException(
+            e.response?.data['message'] ?? 'Poin tidak cukup',
             statusCode: 400);
       }
       throw NetworkErrorHandler.handle(e);

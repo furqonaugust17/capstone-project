@@ -25,6 +25,9 @@ import 'package:app/features/game_session/presentation/pages/session_detail_page
 import 'package:app/features/leaderboard/presentation/bloc/leaderboard_cubit.dart';
 import 'package:app/features/leaderboard/presentation/pages/leaderboard_page.dart';
 import 'package:app/features/statistics/presentation/pages/statistics_page.dart';
+import 'package:app/features/shop/presentation/pages/shop_page.dart';
+import 'package:app/features/shop/presentation/pages/shop_item_detail_page.dart';
+import 'package:app/features/shop/domain/entities/shop_item_entity.dart';
 
 class AppRouter {
   static final router = GoRouter(
@@ -178,6 +181,19 @@ class AppRouter {
         path: '/statistics',
         name: 'statistics',
         builder: (context, state) => const StatisticsPage(),
+      ),
+      GoRoute(
+        path: '/shop',
+        name: 'shop',
+        builder: (context, state) => const ShopPage(),
+      ),
+      GoRoute(
+        path: '/shop/:id',
+        name: 'shop_detail',
+        builder: (context, state) {
+          final item = state.extra as ShopItemEntity;
+          return ShopItemDetailPage(item: item);
+        },
       ),
     ],
     errorBuilder: (context, state) {

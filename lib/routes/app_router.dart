@@ -21,6 +21,10 @@ import 'package:app/features/game_session/presentation/bloc/history/history_cubi
 import 'package:app/features/game_session/presentation/bloc/detail/session_detail_cubit.dart';
 import 'package:app/features/game_session/presentation/pages/history_page.dart';
 import 'package:app/features/game_session/presentation/pages/session_detail_page.dart';
+import 'package:app/features/game_session/presentation/pages/session_detail_page.dart';
+import 'package:app/features/leaderboard/presentation/bloc/leaderboard_cubit.dart';
+import 'package:app/features/leaderboard/presentation/pages/leaderboard_page.dart';
+import 'package:app/features/statistics/presentation/pages/statistics_page.dart';
 
 class AppRouter {
   static final router = GoRouter(
@@ -161,6 +165,19 @@ class AppRouter {
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '/leaderboard',
+        name: 'leaderboard',
+        builder: (context, state) => BlocProvider(
+          create: (context) => di<LeaderboardCubit>(),
+          child: const LeaderboardPage(),
+        ),
+      ),
+      GoRoute(
+        path: '/statistics',
+        name: 'statistics',
+        builder: (context, state) => const StatisticsPage(),
       ),
     ],
     errorBuilder: (context, state) {

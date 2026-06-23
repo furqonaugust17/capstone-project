@@ -8,6 +8,8 @@ import 'package:app/core/theme/app_colors.dart';
 import 'package:app/core/theme/app_text_styles.dart';
 import '../bloc/history/history_cubit.dart';
 
+import 'package:app/shared/widgets/custom_app_bar.dart';
+
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
 
@@ -48,38 +50,7 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(64),
-        child: AppBar(
-          backgroundColor: const Color(0xE6F8FAFD),
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          centerTitle: false,
-          title: const Text(
-            'RIWAYAT MENGGAMBAR KAMU',
-            style: TextStyle(
-              fontFamily: 'Plus Jakarta Sans',
-              fontWeight: FontWeight.w800,
-              fontSize: 16,
-              color: Color(0xFF4285F4),
-            ),
-          ),
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12, right: 4),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFD3E3FD),
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(Icons.arrow_back, color: Color(0xFF041E49), size: 20),
-                onPressed: () => context.pop(),
-              ),
-            ),
-          ),
-        ),
-      ),
+      appBar: const CustomAppBar(title: 'RIWAYAT MENGGAMBAR KAMU'),
       body: BlocBuilder<HistoryCubit, HistoryState>(
         builder: (context, state) {
           if (state.status == HistoryStatus.loading && state.items.isEmpty) {

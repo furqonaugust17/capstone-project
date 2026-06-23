@@ -8,6 +8,8 @@ import '../bloc/detail/session_detail_cubit.dart';
 // Note: We could reuse ResultSceneSection but since ResultSceneSection needs imageBytes 
 // and some other specific states, we can build a simple detail view here or refactor.
 
+import 'package:app/shared/widgets/custom_app_bar.dart';
+
 class SessionDetailPage extends StatefulWidget {
   final String sessionId;
 
@@ -27,11 +29,7 @@ class _SessionDetailPageState extends State<SessionDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detail Sesi'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
-      ),
+      appBar: const CustomAppBar(title: 'DETAIL SESI'),
       backgroundColor: AppColors.background,
       body: BlocBuilder<SessionDetailCubit, SessionDetailState>(
         builder: (context, state) {

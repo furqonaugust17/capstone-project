@@ -8,6 +8,8 @@ import 'package:app/features/purchase/presentation/bloc/purchase_cubit.dart';
 import 'package:app/features/purchase/presentation/bloc/purchase_state.dart';
 import 'package:app/injection/injection.dart';
 import 'package:go_router/go_router.dart';
+import 'package:app/features/auth/presentation/bloc/auth_bloc.dart' as app_auth;
+import 'package:app/features/auth/presentation/bloc/auth_event.dart' as app_auth;
 
 class ShopItemDetailPage extends StatelessWidget {
   final ShopItemEntity item;
@@ -73,6 +75,7 @@ class _ShopItemDetailView extends StatelessWidget {
       body: BlocListener<PurchaseCubit, PurchaseState>(
         listener: (context, state) {
           if (state is PurchaseSuccess) {
+            context.read<app_auth.AuthBloc>().add(app_auth.AuthPointsDeducted(item.price));
             _showPurchaseDialog(context, 'Berhasil membeli ${item.name}!', isSuccess: true);
           } else if (state is PurchaseError) {
             _showPurchaseDialog(context, state.message);

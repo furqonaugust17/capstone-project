@@ -26,6 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginRequested>(_onAuthLoginRequested);
     on<AuthRegisterRequested>(_onAuthRegisterRequested);
     on<AuthLogoutRequested>(_onAuthLogoutRequested);
+    on<AuthPointsDeducted>(_onAuthPointsDeducted);
   }
 
   Future<void> _onAuthCheckRequested(
@@ -75,6 +76,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthLoading());
     await _logoutUseCase();
     emit(const Unauthenticated());
+  }
+
+  void _onAuthPointsDeducted(
+      AuthPointsDeducted event, Emitter<AuthState> emit) {
+    if (state is Authenticated) {
+      final user = (state as Authenticated).user;
+      final updatedUser = user.copyWith(
+        totalPoint: user.totalPoint - event.pointsToDeduct,
+      );
+      emit(Authenticated(updatedUser));
+    }
   }
 
   String _getUserFriendlyErrorMessage(Object error) {

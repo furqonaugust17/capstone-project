@@ -41,3 +41,12 @@ class AuthRegisterRequested extends AuthEvent {
 class AuthLogoutRequested extends AuthEvent {
   const AuthLogoutRequested();
 }
+
+class AuthPointsDeducted extends AuthEvent {
+  final int pointsToDeduct;
+
+  const AuthPointsDeducted(this.pointsToDeduct);
+
+  @override
+  List<Object?> get props => [pointsToDeduct];
+}

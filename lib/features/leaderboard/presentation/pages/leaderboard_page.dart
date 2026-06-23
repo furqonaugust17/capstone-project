@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../bloc/leaderboard_cubit.dart';
 import '../bloc/leaderboard_state.dart';
-import '../widgets/leaderboard_podium.dart';
-import '../widgets/leaderboard_item_tile.dart';
-import '../widgets/my_rank_card.dart';
 import 'package:app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:app/features/auth/presentation/bloc/auth_state.dart';
+import '../../domain/entities/leaderboard_entry_entity.dart';
+import '../../domain/entities/my_rank_entity.dart';
 
 class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({super.key});
@@ -17,90 +17,17 @@ class LeaderboardPage extends StatefulWidget {
   State<LeaderboardPage> createState() => _LeaderboardPageState();
 }
 
-class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
+class _LeaderboardPageState extends State<LeaderboardPage> {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(_onTabChanged);
-    _loadData();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  void _onTabChanged() {
-    if (_tabController.indexIsChanging) return;
-    _loadData();
-  }
-
-  void _loadData() {
-    final cubit = context.read<LeaderboardCubit>();
-    switch (_tabController.index) {
-      case 0:
-        cubit.fetchLiveLeaderboard();
-        break;
-      case 1:
-        cubit.fetchSnapshot(period: 'weekly', periodLabel: 'Minggu Ini');
-        break;
-      case 2:
-        cubit.fetchSnapshot(period: 'monthly', periodLabel: 'Bulan Ini');
-        break;
-    }
+    context.read<LeaderboardCubit>().fetchLiveLeaderboard();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(110), // Increased height for TabBar
-        child: AppBar(
-          backgroundColor: const Color(0xE6F8FAFD),
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          centerTitle: false,
-          title: const Text(
-            'PERINGKAT',
-            style: TextStyle(
-              fontFamily: 'Plus Jakarta Sans',
-              fontWeight: FontWeight.w800,
-              fontSize: 20,
-              color: Color(0xFF4285F4),
-            ),
-          ),
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12, right: 4),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFD3E3FD),
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(Icons.arrow_back, color: Color(0xFF041E49), size: 20),
-                onPressed: () => context.pop(),
-              ),
-            ),
-          ),
-          bottom: TabBar(
-            controller: _tabController,
-            labelColor: const Color(0xFF4285F4),
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: const Color(0xFF4285F4),
-            tabs: const [
-              Tab(text: 'Live'),
-              Tab(text: 'Mingguan'),
-              Tab(text: 'Bulanan'),
-            ],
-          ),
-        ),
-      ),
       body: BlocBuilder<LeaderboardCubit, LeaderboardState>(
         builder: (context, state) {
           if (state is LeaderboardLoading) {
@@ -115,7 +42,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                   Text('Gagal memuat: ${state.message}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: _loadData,
+                    onPressed: () => context.read<LeaderboardCubit>().fetchLiveLeaderboard(),
                     child: const Text('Coba Lagi'),
                   ),
                 ],
@@ -124,78 +51,196 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
           }
 
           if (state is LeaderboardLoaded) {
-            final rankings = _tabController.index == 0
-                ? (state.liveRankings ?? [])
-                : (state.snapshot?.rankings.map((e) => e).toList() ?? []); // For now assuming snapshot.rankings maps correctly
-                
-            // Convert models to entities if necessary. Wait, snapshot rankings are already entities from Cubit!
-            final List<dynamic> currentRankings = _tabController.index == 0
-                ? (state.liveRankings ?? [])
-                : (state.snapshot?.rankings ?? []);
-
-            final topThree = currentRankings.take(3).toList();
-            final remaining = currentRankings.skip(3).toList();
+            final rankings = state.liveRankings ?? [];
+            final topThree = rankings.take(3).toList();
+            final remaining = rankings.skip(3).toList();
             final myRank = state.myRank;
             
-            // Getting current user ID from AuthBloc to highlight user in list
             final authState = context.read<AuthBloc>().state;
             String? currentUserId;
             if (authState is Authenticated) {
                currentUserId = authState.user.id;
             }
 
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                final isLandscape = constraints.maxWidth > 600;
-
-                Widget content = isLandscape
-                    ? Row(
-                        children: [
-                          Expanded(
-                            flex: 5,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Center(
-                                    child: SingleChildScrollView(
-                                      child: LeaderboardPodium(
-                                        topThree: topThree.cast(),
+            return Center(
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Container(
+                  width: 917,
+                  height: 462,
+                  color: Colors.white,
+                  child: Stack(
+                    children: [
+                      // Header
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        width: 917,
+                        height: 64,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          color: const Color.fromRGBO(248, 250, 253, 0.9),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => context.pop(),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFD3E3FD),
+                                        shape: BoxShape.circle,
                                       ),
+                                      child: const Icon(Icons.arrow_back, color: Color(0xFF041E49), size: 16),
                                     ),
                                   ),
+                                  const SizedBox(width: 16),
+                                ],
+                              ),
+                              const Text(
+                                'PERINGKAT',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 20,
+                                  color: Color(0xFF4285F4),
                                 ),
-                                if (myRank != null) MyRankCard(myRank: myRank),
+                              ),
+                              const SizedBox(width: 32), // Balance the row
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Podium Peringkat 2
+                      if (topThree.length > 1)
+                        Positioned(
+                          left: 104,
+                          top: 139,
+                          width: 101,
+                          height: 229,
+                          child: _buildPodium(topThree[1], 2, const Color(0xFF8F8F8F), 159),
+                        ),
+
+                      // Podium Peringkat 1
+                      if (topThree.isNotEmpty)
+                        Positioned(
+                          left: 220,
+                          top: 80,
+                          width: 101,
+                          height: 288,
+                          child: _buildPodium(topThree[0], 1, const Color(0xFFFFD900), 218),
+                        ),
+
+                      // Podium Peringkat 3
+                      if (topThree.length > 2)
+                        Positioned(
+                          left: 336,
+                          top: 166,
+                          width: 101,
+                          height: 202,
+                          child: _buildPodium(topThree[2], 3, const Color(0xFFF29D38), 132),
+                        ),
+
+                      // My Rank Widget
+                      if (myRank != null)
+                        Positioned(
+                          left: 56,
+                          top: 317,
+                          width: 429,
+                          height: 95,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFD3E3FD),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 15),
+                                Container(
+                                  width: 67,
+                                  height: 67,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFD9D9D9),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.person, color: Colors.white, size: 40),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Kamu Peringkat Ke-${myRank.rank}',
+                                      style: const TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${NumberFormat('#,###').format(myRank.totalScore)} Poin',
+                                      style: const TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
-                          Expanded(
-                            flex: 5,
-                            child: _buildListSection(remaining.cast(), currentUserId),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  LeaderboardPodium(topThree: topThree.cast()),
-                                  const SizedBox(height: 24),
-                                  _buildListSection(remaining.cast(), currentUserId, isPortrait: true),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (myRank != null) MyRankCard(myRank: myRank),
-                        ],
-                      );
+                        ),
 
-                return RefreshIndicator(
-                  onRefresh: () async => _loadData(),
-                  child: content,
-                );
-              },
+                      // List Peringkat
+                      Positioned(
+                        left: 546,
+                        top: 64,
+                        width: 371,
+                        height: 398,
+                        child: Container(
+                          color: const Color(0xFFF3F3FA),
+                          padding: const EdgeInsets.only(top: 22, left: 33, right: 32),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Daftar Peringkat',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 24,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              Expanded(
+                                child: ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  itemCount: remaining.length,
+                                  itemBuilder: (context, index) {
+                                    final entry = remaining[index];
+                                    return _buildListItem(entry, index + 4, entry.userId == currentUserId);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             );
           }
 
@@ -205,41 +250,144 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
     );
   }
 
-  Widget _buildListSection(List<dynamic> remaining, String? currentUserId, {bool isPortrait = false}) {
-    return Container(
-      margin: isPortrait ? const EdgeInsets.symmetric(horizontal: 16) : const EdgeInsets.only(top: 24, right: 24, bottom: 24),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F3FA),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Daftar Peringkat',
-            style: TextStyle(
-              fontFamily: 'Plus Jakarta Sans',
-              fontWeight: FontWeight.w800,
-              fontSize: 24,
-              color: Colors.black,
+  Widget _buildPodium(LeaderboardEntryEntity entry, int rank, Color borderColor, double rectHeight) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          width: 67,
+          height: 67,
+          decoration: const BoxDecoration(
+            color: Color(0xFFD9D9D9),
+            shape: BoxShape.circle,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: entry.avatarUrl != null
+              ? Image.network(entry.avatarUrl!, fit: BoxFit.cover)
+              : Center(
+                  child: Text(
+                    entry.displayName.isNotEmpty ? entry.displayName[0].toUpperCase() : entry.username[0].toUpperCase(),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black54),
+                  ),
+                ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          entry.displayName,
+          style: const TextStyle(
+            fontFamily: 'Plus Jakarta Sans',
+            fontWeight: FontWeight.w800,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text(
+          '${NumberFormat('#,###').format(entry.totalScore)}',
+          style: const TextStyle(
+            fontFamily: 'Plus Jakarta Sans',
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          width: 101,
+          height: rectHeight,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF3F3FA),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+            border: Border(
+              top: BorderSide(color: borderColor, width: 5),
+              left: BorderSide(color: borderColor, width: 5),
+              right: BorderSide(color: borderColor, width: 5),
             ),
           ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: remaining.isEmpty
-                ? const Center(child: Text('Belum ada peringkat lainnya.'))
-                : ListView.builder(
-                    itemCount: remaining.length,
-                    itemBuilder: (context, index) {
-                      final entry = remaining[index];
-                      return LeaderboardItemTile(
-                        entry: entry,
-                        rank: index + 4,
-                        isCurrentUser: entry.userId == currentUserId,
-                      );
-                    },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildListItem(LeaderboardEntryEntity entry, int rank, bool isCurrentUser) {
+    return Container(
+      width: 306,
+      height: 78,
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFD),
+        borderRadius: BorderRadius.circular(10),
+        border: isCurrentUser ? Border.all(color: Colors.blueAccent, width: 2) : null,
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            left: 11,
+            top: 31,
+            child: SizedBox(
+              width: 25,
+              child: Text(
+                '#$rank',
+                style: const TextStyle(
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 49,
+            top: 12,
+            child: Container(
+              width: 55,
+              height: 55,
+              decoration: const BoxDecoration(
+                color: Color(0xFFD9D9D9),
+                shape: BoxShape.circle,
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: entry.avatarUrl != null
+                  ? Image.network(entry.avatarUrl!, fit: BoxFit.cover)
+                  : Center(
+                      child: Text(
+                        entry.displayName.isNotEmpty ? entry.displayName[0].toUpperCase() : entry.username[0].toUpperCase(),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),
+                      ),
+                    ),
+            ),
+          ),
+          Positioned(
+            left: 110,
+            top: 24,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isCurrentUser ? '${entry.displayName} (Kamu)' : entry.displayName,
+                  style: const TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    color: Colors.black,
                   ),
+                ),
+                Text(
+                  '${NumberFormat('#,###').format(entry.totalScore)} Poin',
+                  style: const TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

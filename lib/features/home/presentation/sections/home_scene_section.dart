@@ -23,6 +23,35 @@ class HomeSceneSection extends StatelessWidget {
             const HomeDecorationsSection(),
             HomeHeroSection(onStartPressed: onStartPressed),
             const Positioned(bottom: 10, left: 10, child: HomeProfileWidget()),
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: Row(
+                children: [
+                  FloatingActionButton.extended(
+                    heroTag: 'inventory_btn',
+                    onPressed: () => context.push('/inventory'),
+                    backgroundColor: Colors.blueAccent,
+                    icon: const Icon(Icons.inventory_2, color: Colors.white),
+                    label: const Text(
+                      'Inventori',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  FloatingActionButton.extended(
+                    heroTag: 'shop_btn',
+                    onPressed: () => context.push('/shop'),
+                    backgroundColor: Colors.orange,
+                    icon: const Icon(Icons.storefront, color: Colors.white),
+                    label: const Text(
+                      'Toko',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

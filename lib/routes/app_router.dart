@@ -28,6 +28,7 @@ import 'package:app/features/statistics/presentation/pages/statistics_page.dart'
 import 'package:app/features/shop/presentation/pages/shop_page.dart';
 import 'package:app/features/shop/presentation/pages/shop_item_detail_page.dart';
 import 'package:app/features/shop/domain/entities/shop_item_entity.dart';
+import 'package:app/features/inventory/presentation/pages/inventory_page.dart';
 
 class AppRouter {
   static final router = GoRouter(
@@ -186,6 +187,11 @@ class AppRouter {
         path: '/shop',
         name: 'shop',
         builder: (context, state) => const ShopPage(),
+      ),
+      GoRoute(
+        path: '/inventory',
+        name: 'inventory',
+        builder: (context, state) => const InventoryPage(),
       ),
       GoRoute(
         path: '/shop/:id',

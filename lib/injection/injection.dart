@@ -12,6 +12,7 @@ import 'package:app/features/splash/injection.dart' as splash_injection;
 import 'package:app/features/game_session/injection.dart' as game_session_injection;
 import 'package:app/features/leaderboard/injection.dart' as leaderboard_injection;
 import 'package:app/features/statistics/injection.dart' as statistics_injection;
+import 'package:app/features/inventory/injection.dart' as inventory_injection;
 import 'package:app/features/shop/injection.dart' as shop_injection;
 import 'package:app/features/purchase/injection.dart' as purchase_injection;
 import 'package:get_it/get_it.dart';
@@ -43,6 +44,7 @@ Future<void> configureDependencies() async {
   await game_session_injection.initGameSessionFeature(di);
   await leaderboard_injection.initLeaderboardFeature(di);
   await statistics_injection.initStatisticsFeature(di);
+  await inventory_injection.initInventoryFeature(di);
   await shop_injection.initShopFeature(di);
   await purchase_injection.initPurchaseFeature(di);
 }

@@ -58,7 +58,15 @@ class HomeHeroSection extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.collections, color: Colors.blue, size: 30),
+                      Container(
+                        width: 37,
+                        height: 37,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.collections, color: Colors.blue, size: 20),
+                      ),
                       Text('Galeri', style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
                     ],
                   )
@@ -76,7 +84,15 @@ class HomeHeroSection extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.leaderboard, color: Color(0xFFFFD900), size: 30),
+                      Container(
+                        width: 37,
+                        height: 37,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.leaderboard, color: Color(0xFFFFD900), size: 20),
+                      ),
                       Text('Peringkat', style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
                     ],
                   )
@@ -94,7 +110,15 @@ class HomeHeroSection extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.store, color: Color(0xFFF29D38), size: 30),
+                      Container(
+                        width: 37,
+                        height: 37,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.store, color: Color(0xFFF29D38), size: 20),
+                      ),
                       Text('Toko', style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
                     ],
                   )

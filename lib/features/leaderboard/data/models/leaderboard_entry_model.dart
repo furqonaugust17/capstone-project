@@ -4,35 +4,21 @@ import '../../domain/entities/leaderboard_entry_entity.dart';
 part 'leaderboard_entry_model.g.dart';
 
 @JsonSerializable()
-class LeaderboardUserModel {
-  final String username;
-  final String displayName;
-  final String? avatarUrl;
-
-  const LeaderboardUserModel({
-    required this.username,
-    required this.displayName,
-    this.avatarUrl,
-  });
-
-  factory LeaderboardUserModel.fromJson(Map<String, dynamic> json) =>
-      _$LeaderboardUserModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$LeaderboardUserModelToJson(this);
-}
-
-@JsonSerializable()
 class LeaderboardEntryModel {
   final String userId;
   final int totalScore;
   final int totalGames;
-  final LeaderboardUserModel user;
+  final String username;
+  final String displayName;
+  final String? avatarUrl;
 
   const LeaderboardEntryModel({
     required this.userId,
     required this.totalScore,
     required this.totalGames,
-    required this.user,
+    required this.username,
+    required this.displayName,
+    this.avatarUrl,
   });
 
   factory LeaderboardEntryModel.fromJson(Map<String, dynamic> json) =>
@@ -44,8 +30,8 @@ class LeaderboardEntryModel {
         userId: userId,
         totalScore: totalScore,
         totalGames: totalGames,
-        username: user.username,
-        displayName: user.displayName,
-        avatarUrl: user.avatarUrl,
+        username: username,
+        displayName: displayName,
+        avatarUrl: avatarUrl,
       );
 }

@@ -64,207 +64,210 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             }
 
             return Center(
-              child: Container(
-                width: 917,
-                height: 462,
-                color: Colors.white,
-                child: Stack(
-                  children: [
-                    // Header
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      width: 917,
-                      height: 64,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        color: const Color.fromRGBO(248, 250, 253, 0.9),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () => context.pop(),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFD3E3FD),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.arrow_back,
-                                      color: Color(0xFF041E49),
-                                      size: 16,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                              ],
-                            ),
-                            const Text(
-                              'PERINGKAT',
-                              style: TextStyle(
-                                fontFamily: 'Plus Jakarta Sans',
-                                fontWeight: FontWeight.w800,
-                                fontSize: 20,
-                                color: Color(0xFF4285F4),
-                              ),
-                            ),
-                            const SizedBox(width: 32), // Balance the row
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // Podium Peringkat 2
-                    if (topThree.length > 1)
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Container(
+                  width: 917,
+                  height: 412,
+                  color: Colors.white,
+                  child: Stack(
+                    children: [
+                      // Header
                       Positioned(
-                        left: 104,
-                        top: 139,
-                        width: 101,
-                        height: 229,
-                        child: _buildPodium(
-                          topThree[1],
-                          2,
-                          const Color(0xFF8F8F8F),
-                        ),
-                      ),
-
-                    // Podium Peringkat 1
-                    if (topThree.isNotEmpty)
-                      Positioned(
-                        left: 220,
-                        top: 80,
-                        width: 101,
-                        height: 288,
-                        child: _buildPodium(
-                          topThree[0],
-                          1,
-                          const Color(0xFFFFD900),
-                        ),
-                      ),
-
-                    // Podium Peringkat 3
-                    if (topThree.length > 2)
-                      Positioned(
-                        left: 336,
-                        top: 166,
-                        width: 101,
-                        height: 202,
-                        child: _buildPodium(
-                          topThree[2],
-                          3,
-                          const Color(0xFFF29D38),
-                        ),
-                      ),
-
-                    // My Rank Widget
-                    if (myRank != null)
-                      Positioned(
-                        left: 56,
-                        top: 317,
-                        width: 429,
-                        height: 95,
+                        left: 0,
+                        top: 0,
+                        width: 917,
+                        height: 64,
                         child: Container(
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFD3E3FD),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                            ),
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          color: const Color.fromRGBO(248, 250, 253, 0.9),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const SizedBox(width: 15),
-                              Container(
-                                width: 67,
-                                height: 67,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFD9D9D9),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.person,
-                                  color: Colors.white,
-                                  size: 40,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Row(
                                 children: [
-                                  Text(
-                                    'Kamu Peringkat Ke-${myRank.rank}',
-                                    style: const TextStyle(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16,
-                                      color: Colors.black,
+                                  GestureDetector(
+                                    onTap: () => context.pop(),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFD3E3FD),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.arrow_back,
+                                        color: Color(0xFF041E49),
+                                        size: 16,
+                                      ),
                                     ),
                                   ),
-                                  Text(
-                                    '${NumberFormat('#,###').format(myRank.totalScore)} Poin',
-                                    style: const TextStyle(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12,
-                                      color: Colors.black,
-                                    ),
-                                  ),
+                                  const SizedBox(width: 16),
                                 ],
                               ),
+                              const Text(
+                                'PERINGKAT',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 20,
+                                  color: Color(0xFF4285F4),
+                                ),
+                              ),
+                              const SizedBox(width: 32), // Balance the row
                             ],
                           ),
                         ),
                       ),
 
-                    // List Peringkat
-                    Positioned(
-                      left: 546,
-                      top: 64,
-                      width: 371,
-                      height: 398,
-                      child: Container(
-                        color: const Color(0xFFF3F3FA),
-                        padding: const EdgeInsets.only(
-                          top: 22,
-                          left: 33,
-                          right: 32,
+                      // Podium Peringkat 2
+                      if (topThree.length > 1)
+                        Positioned(
+                          left: 104,
+                          top: 139,
+                          width: 101,
+                          height: 229,
+                          child: _buildPodium(
+                            topThree[1],
+                            2,
+                            const Color(0xFF8F8F8F),
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Daftar Peringkat',
-                              style: TextStyle(
-                                fontFamily: 'Plus Jakarta Sans',
-                                fontWeight: FontWeight.w800,
-                                fontSize: 24,
-                                color: Colors.black,
+
+                      // Podium Peringkat 1
+                      if (topThree.isNotEmpty)
+                        Positioned(
+                          left: 220,
+                          top: 80,
+                          width: 101,
+                          height: 288,
+                          child: _buildPodium(
+                            topThree[0],
+                            1,
+                            const Color(0xFFFFD900),
+                          ),
+                        ),
+
+                      // Podium Peringkat 3
+                      if (topThree.length > 2)
+                        Positioned(
+                          left: 336,
+                          top: 166,
+                          width: 101,
+                          height: 202,
+                          child: _buildPodium(
+                            topThree[2],
+                            3,
+                            const Color(0xFFF29D38),
+                          ),
+                        ),
+
+                      // My Rank Widget
+                      if (myRank != null)
+                        Positioned(
+                          left: 56,
+                          top: 317,
+                          width: 429,
+                          height: 95,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFD3E3FD),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
                               ),
                             ),
-                            const SizedBox(height: 18),
-                            Expanded(
-                              child: ListView.builder(
-                                padding: EdgeInsets.zero,
-                                itemCount: remaining.length,
-                                itemBuilder: (context, index) {
-                                  final entry = remaining[index];
-                                  return _buildListItem(
-                                    entry,
-                                    index + 4,
-                                    entry.userId == currentUserId,
-                                  );
-                                },
-                              ),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 15),
+                                Container(
+                                  width: 67,
+                                  height: 67,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFD9D9D9),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 40,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Kamu Peringkat Ke-${myRank.rank}',
+                                      style: const TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${NumberFormat('#,###').format(myRank.totalScore)} Poin',
+                                      style: const TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
+                        ),
+
+                      // List Peringkat
+                      Positioned(
+                        left: 546,
+                        top: 64,
+                        width: 371,
+                        height: 348,
+                        child: Container(
+                          color: const Color(0xFFF3F3FA),
+                          padding: const EdgeInsets.only(
+                            top: 22,
+                            left: 33,
+                            right: 32,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Daftar Peringkat',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 24,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              Expanded(
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.only(bottom: 22),
+                                  itemCount: remaining.length,
+                                  itemBuilder: (context, index) {
+                                    final entry = remaining[index];
+                                    return _buildListItem(
+                                      entry,
+                                      index + 4,
+                                      entry.userId == currentUserId,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );

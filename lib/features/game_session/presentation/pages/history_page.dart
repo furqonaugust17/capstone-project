@@ -9,6 +9,7 @@ import 'package:app/core/theme/app_text_styles.dart';
 import '../bloc/history/history_cubit.dart';
 
 import 'package:app/shared/widgets/custom_app_bar.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -110,15 +111,25 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget _buildHistoryCard(BuildContext context, GameSessionEntity item) {
-    int stars = 0;
-    if (item.gameScore >= 80) {
-      stars = 3;
-    } else if (item.gameScore >= 50) {
-      stars = 2;
-    } else if (item.gameScore >= 20) {
-      stars = 1;
+  double _calculateRating(double similarity, int timeInSeconds) {
+    // Similarity weight: Max 2.8 stars
+    double baseScore = (similarity / 100.0) * 2.8;
+
+    // Time bonus weight: Max 0.2 stars
+    double timeBonus = 0.0;
+    if (timeInSeconds <= 15) {
+      timeBonus = 0.2;
+    } else if (timeInSeconds <= 60) {
+      // Scales down linearly from 0.2 to 0.0 between 15 and 60 seconds
+      timeBonus = 0.2 - ((timeInSeconds - 15) / 45.0) * 0.2;
     }
+
+    // Clamp total score to [0.0, 3.0]
+    return (baseScore + timeBonus).clamp(0.0, 3.0);
+  }
+
+  Widget _buildHistoryCard(BuildContext context, GameSessionEntity item) {
+    double stars = _calculateRating(item.confidenceScore * 100, item.drawingDuration);
 
     // Default formatting if intl locale hasn't been set up for 'id'
     String formattedDate = DateFormat('dd MMMM yyyy').format(item.startedAt.toLocal());
@@ -159,15 +170,16 @@ class _HistoryPageState extends State<HistoryPage> {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(3, (index) {
-                        return Icon(
-                          Icons.star_rounded,
-                          color: index < stars ? const Color(0xFFFFC107) : Colors.grey.shade400,
-                          size: 24,
-                        );
-                      }),
+                    child: RatingBarIndicator(
+                      rating: stars.toDouble(),
+                      itemBuilder: (context, index) => const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFFFFC107),
+                      ),
+                      itemCount: 3,
+                      itemSize: 24.0,
+                      unratedColor: Colors.grey.shade400,
+                      direction: Axis.horizontal,
                     ),
                   ),
                 ],

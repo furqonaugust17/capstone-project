@@ -41,7 +41,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               Expanded(
                 child: Text(
                   title,
-                  textAlign: TextAlign.right,
+                  textAlign: (actions != null && actions!.isNotEmpty)
+                      ? TextAlign.left
+                      : TextAlign.right,
                   style: const TextStyle(
                     fontFamily: 'Plus Jakarta Sans',
                     fontWeight: FontWeight.w800,
@@ -50,10 +52,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              if (actions != null) ...[
-                const SizedBox(width: 16),
-                ...actions!,
-              ],
+              if (actions != null) ...[const SizedBox(width: 16), ...actions!],
             ],
           ),
         ),

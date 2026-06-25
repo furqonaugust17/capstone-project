@@ -87,7 +87,6 @@ class HomeProfileWidget extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       context.read<AuthBloc>().add(const AuthLogoutRequested());
-                      context.go('/login');
                     },
                     icon: const Icon(Icons.logout, color: Colors.redAccent),
                     tooltip: 'Keluar',

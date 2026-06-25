@@ -30,18 +30,30 @@ import 'package:app/features/shop/presentation/pages/shop_item_detail_page.dart'
 import 'package:app/features/shop/domain/entities/shop_item_entity.dart';
 import 'package:app/features/inventory/presentation/pages/inventory_page.dart';
 
+import 'package:app/routes/go_router_refresh_stream.dart';
+
 class AppRouter {
   static final router = GoRouter(
     initialLocation: '/splash',
+    refreshListenable: GoRouterRefreshStream(
+      di<AuthBloc>().stream.map((state) => state is Unauthenticated).distinct(),
+    ),
     redirect: (context, state) {
-      final authState = context.read<AuthBloc>().state;
+      final authState = di<AuthBloc>().state;
       final isAuthenticated = authState is Authenticated;
+      final isUnauthenticated = authState is Unauthenticated;
+      
       final isAuthRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
       final isSplashRoute = state.matchedLocation == '/splash';
 
-      if (isSplashRoute) return null;
-      if (!isAuthenticated && !isAuthRoute) return '/login';
+      if (isSplashRoute) {
+        if (isAuthenticated) return '/';
+        if (isUnauthenticated) return '/login';
+        return null;
+      }
+
+      if (isUnauthenticated && !isAuthRoute) return '/login';
       if (isAuthenticated && isAuthRoute) return '/';
       return null;
     },

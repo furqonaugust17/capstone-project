@@ -14,9 +14,11 @@ MLModelModel _$MLModelModelFromJson(Map<String, dynamic> json) => MLModelModel(
   inputSize: (json['inputSize'] as num?)?.toInt(),
   accuracy: (json['accuracy'] as num?)?.toDouble(),
   isActive: json['isActive'] as bool,
-  animalModels: (json['animalModels'] as List<dynamic>)
-      .map((e) => AnimalModelRelation.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  animalModels:
+      (json['animalModels'] as List<dynamic>?)
+          ?.map((e) => AnimalModelRelation.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      [],
 );
 
 Map<String, dynamic> _$MLModelModelToJson(MLModelModel instance) =>

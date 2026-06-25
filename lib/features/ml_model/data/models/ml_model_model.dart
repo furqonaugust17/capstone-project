@@ -13,6 +13,7 @@ class MLModelModel {
   final int? inputSize;
   final double? accuracy;
   final bool isActive;
+  @JsonKey(defaultValue: [])
   final List<AnimalModelRelation> animalModels;
 
   const MLModelModel({

@@ -16,7 +16,6 @@ router.post('/', authenticate, requireAdmin, uploadTflite.single('file'), mlMode
 router.put('/:id', authenticate, requireAdmin, uploadTflite.single('file'), mlModelController.update);
 router.patch('/:id/activate', authenticate, requireAdmin, mlModelController.activate);
 router.post('/:id/rollback', authenticate, requireAdmin, mlModelController.rollback);
-router.post('/:id/animals', authenticate, requireAdmin, mlModelController.syncAnimals);
 router.delete('/:id', authenticate, requireAdmin, mlModelController.destroy);
 
 module.exports = router;

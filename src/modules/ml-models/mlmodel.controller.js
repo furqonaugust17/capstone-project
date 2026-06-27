@@ -47,13 +47,6 @@ const update = async (req, res) => {
   res.status(200).json(successResponse(model, 200, 'ML Model updated successfully'));
 };
 
-const syncAnimals = async (req, res) => {
-  const { syncAnimalsSchema } = require('./mlmodel.validation');
-  const data = syncAnimalsSchema.parse(req.body);
-  const result = await mlModelService.syncAnimals(req.params.id, data.animalIds);
-  await clearCache('ml-models:*');
-  res.status(200).json(successResponse(result, 200, 'Animals synced to ML Model successfully'));
-};
 
 const history = async (req, res) => {
   const models = await mlModelService.getModelHistory(req.params.id);
@@ -73,7 +66,6 @@ module.exports = {
   store,
   activate,
   destroy,
-  syncAnimals,
   update,
   history,
   rollback,

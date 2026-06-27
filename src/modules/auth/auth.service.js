@@ -128,6 +128,11 @@ const logout = async (token) => {
 const getMe = async (userId) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    include: {
+      equippedAvatar: true,
+      equippedFrame: true,
+      equippedTheme: true,
+    }
   });
 
   if (!user) {
@@ -137,7 +142,13 @@ const getMe = async (userId) => {
   }
 
   const { passwordHash: _, ...userWithoutPassword } = user;
-  return userWithoutPassword;
+  
+  return {
+    ...userWithoutPassword,
+    equipped_avatar_url: user.equippedAvatar?.imageUrl || null,
+    equipped_frame_url: user.equippedFrame?.imageUrl || null,
+    equipped_theme_url: user.equippedTheme?.imageUrl || null,
+  };
 };
 
 module.exports = {

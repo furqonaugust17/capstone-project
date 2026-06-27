@@ -127,47 +127,7 @@ Animal CNN v2.0
 
 ---
 
-# Animal Model Relationship
 
-## Option 1 (Simple)
-
-```text
-Animal
-- model_id
-```
-
-## Option 2 (Recommended)
-
-```text
-AnimalModel
-- id
-- animal_id
-- model_id
-```
-
-### Why?
-
-Karena di masa depan:
-
-```text
-Lion
-├── Model v1
-├── Model v2
-└── Model v3
-```
-
-atau
-
-```text
-Model A
-├── Lion
-├── Elephant
-└── Cat
-```
-
-lebih mudah dikelola.
-
----
 
 # Game Session
 

@@ -115,12 +115,34 @@ const getMySessions = async (userId, page = 1, limit = 10) => {
   return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
 };
 
-const getSessionById = async (id, userId) => {
+const getAllSessions = async (page = 1, limit = 10, userId = undefined) => {
+  const skip = (page - 1) * limit;
+  const where = userId ? { userId } : {};
+  
+  const [total, data] = await Promise.all([
+    prisma.gameSession.count({ where }),
+    prisma.gameSession.findMany({
+      where,
+      include: {
+        user: { select: { id: true, username: true, displayName: true, email: true } },
+        animal: { select: { id: true, name: true, thumbnailUrl: true } },
+        model: { select: { id: true, name: true, version: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    })
+  ]);
+  return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+};
+
+const getSessionById = async (id, user) => {
   const session = await prisma.gameSession.findUnique({
     where: { id },
     include: {
       animal: true,
       model: true,
+      user: { select: { id: true, username: true, displayName: true, email: true, avatarUrl: true } },
     },
   });
 
@@ -130,7 +152,7 @@ const getSessionById = async (id, userId) => {
     throw error;
   }
 
-  if (session.userId !== userId) {
+  if (session.userId !== user.userId && user.role !== 'ADMIN') {
     const error = new Error('Forbidden: This session does not belong to you');
     error.statusCode = 403;
     throw error;
@@ -142,5 +164,6 @@ const getSessionById = async (id, userId) => {
 module.exports = {
   createSession,
   getMySessions,
+  getAllSessions,
   getSessionById,
 };

@@ -8,9 +8,6 @@ const createModelSchema = z.object({
   accuracy: z.coerce.number().min(0).max(100).optional(),
 });
 
-const syncAnimalsSchema = z.object({
-  animalIds: z.array(z.string().uuid()),
-});
 
 const updateModelSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -22,6 +19,5 @@ const updateModelSchema = z.object({
 
 module.exports = {
   createModelSchema,
-  syncAnimalsSchema,
   updateModelSchema,
 };

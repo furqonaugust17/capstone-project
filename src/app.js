@@ -88,7 +88,7 @@ const mlModelRoutes = require('./modules/ml-models/mlmodel.routes');
 const gameSessionRoutes = require('./modules/game-sessions/gamesession.routes');
 const statisticsRoutes = require('./modules/statistics/statistics.routes');
 const userRoutes = require('./modules/users/user.routes');
-const relationshipRoutes = require('./modules/relationships/relationship.routes');
+
 const shopRoutes = require('./modules/shop/shop.routes');
 const purchaseRoutes = require('./modules/purchase/purchase.routes');
 const inventoryRoutes = require('./modules/inventory/inventory.routes');
@@ -102,7 +102,7 @@ app.use('/api/ml-models', mlModelRoutes);
 app.use('/api/game-sessions', gameSessionRoutes);
 app.use('/api/statistics', statisticsRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/relationships', relationshipRoutes);
+
 app.use('/api/shop', shopRoutes);
 app.use('/api/purchase', purchaseRoutes);
 app.use('/api/inventory', inventoryRoutes);

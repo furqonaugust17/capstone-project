@@ -9,6 +9,8 @@ router.use(authenticate, requireAdmin);
 
 router.get('/', userController.index);
 router.get('/:id', userController.show);
+router.get('/:id/inventory', userController.inventory);
+router.get('/:id/purchases', userController.purchases);
 router.delete('/:id', userController.destroy);
 
 module.exports = router;

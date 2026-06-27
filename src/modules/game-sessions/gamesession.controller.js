@@ -11,9 +11,18 @@ const index = async (req, res) => {
   res.status(200).json(successResponse(result, 200, 'Game sessions fetched successfully'));
 };
 
+const getAll = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const userId = req.query.userId || undefined;
+  
+  const result = await gameSessionService.getAllSessions(page, limit, userId);
+  res.status(200).json(successResponse(result, 200, 'All game sessions fetched successfully'));
+};
+
 const show = async (req, res) => {
-  const userId = req.user.userId;
-  const session = await gameSessionService.getSessionById(req.params.id, userId);
+  const user = req.user;
+  const session = await gameSessionService.getSessionById(req.params.id, user);
   res.status(200).json(successResponse(session, 200, 'Game session fetched successfully'));
 };
 
@@ -26,6 +35,7 @@ const store = async (req, res) => {
 
 module.exports = {
   index,
+  getAll,
   show,
   store,
 };

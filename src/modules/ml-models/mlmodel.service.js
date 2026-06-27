@@ -11,12 +11,7 @@ const getAllModels = async (page = 1, limit = 10) => {
     prisma.mLModel.findMany({
       orderBy: { createdAt: 'desc' },
       skip,
-      take: limit,
-      include: {
-        animalModels: {
-          include: { animal: true }
-        }
-      }
+      take: limit
     })
   ]);
   return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
@@ -24,12 +19,7 @@ const getAllModels = async (page = 1, limit = 10) => {
 
 const getActiveModel = async () => {
   const model = await prisma.mLModel.findFirst({
-    where: { isActive: true },
-    include: {
-      animalModels: {
-        include: { animal: true }
-      }
-    }
+    where: { isActive: true }
   });
 
   if (!model) {
@@ -121,35 +111,6 @@ const deleteModel = async (id) => {
   });
 };
 
-const syncAnimals = async (modelId, animalIds) => {
-  const model = await prisma.mLModel.findUnique({ where: { id: modelId } });
-  if (!model) {
-    const error = new Error('ML Model not found');
-    error.statusCode = 404;
-    throw error;
-  }
-
-  await prisma.$transaction(async (tx) => {
-    await tx.animalModel.deleteMany({
-      where: { modelId },
-    });
-
-    if (animalIds && animalIds.length > 0) {
-      const dataToInsert = animalIds.map((animalId) => ({
-        modelId,
-        animalId,
-      }));
-      await tx.animalModel.createMany({
-        data: dataToInsert,
-      });
-    }
-  });
-
-  return await prisma.animalModel.findMany({
-    where: { modelId },
-    include: { animal: true },
-  });
-};
 
 const updateModel = async (id, data, file) => {
   const model = await prisma.mLModel.findUnique({ where: { id } });
@@ -207,7 +168,6 @@ module.exports = {
   createModel,
   activateModel,
   deleteModel,
-  syncAnimals,
   updateModel,
   getModelById,
   getModelHistory

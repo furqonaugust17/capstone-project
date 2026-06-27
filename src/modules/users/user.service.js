@@ -69,8 +69,64 @@ const deleteUser = async (id) => {
   await prisma.user.delete({ where: { id } });
 };
 
+const getUserInventory = async (userId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  // Verify user exists first
+  await getUserById(userId);
+
+  const [total, data] = await Promise.all([
+    prisma.userInventory.count({ where: { userId } }),
+    prisma.userInventory.findMany({
+      where: { userId },
+      include: {
+        shopItem: {
+          select: { id: true, name: true, category: true, rarity: true, imageUrl: true }
+        }
+      },
+      orderBy: { acquiredAt: 'desc' },
+      skip,
+      take: limit,
+    })
+  ]);
+
+  return {
+    data,
+    meta: { total, page, limit, totalPages: Math.ceil(total / limit) }
+  };
+};
+
+const getUserPurchases = async (userId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  // Verify user exists first
+  await getUserById(userId);
+
+  const [total, data] = await Promise.all([
+    prisma.purchaseHistory.count({ where: { userId } }),
+    prisma.purchaseHistory.findMany({
+      where: { userId },
+      include: {
+        shopItem: {
+          select: { id: true, name: true, category: true, rarity: true, imageUrl: true }
+        }
+      },
+      orderBy: { purchasedAt: 'desc' },
+      skip,
+      take: limit,
+    })
+  ]);
+
+  return {
+    data,
+    meta: { total, page, limit, totalPages: Math.ceil(total / limit) }
+  };
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
-  deleteUser
+  deleteUser,
+  getUserInventory,
+  getUserPurchases
 };

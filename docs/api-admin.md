@@ -147,6 +147,18 @@ Manajemen akun pemain yang terdaftar.
 - **Auth**: Required (Admin)
 - **Catatan**: Ini akan menghapus user beserta seluruh riwayat permainannya (Cascade delete).
 
+### Get User Inventory
+- **Endpoint**: `GET /users/:id/inventory`
+- **Auth**: Required (Admin)
+- **Query Params**: `?page=1&limit=10`
+- **Deskripsi**: Melihat seluruh item shop yang dimiliki user.
+
+### Get User Purchases
+- **Endpoint**: `GET /users/:id/purchases`
+- **Auth**: Required (Admin)
+- **Query Params**: `?page=1&limit=10`
+- **Deskripsi**: Melihat histori pembelian shop item milik user.
+
 ---
 
 ## 5️⃣ Manage Shop (`/api/shop`)
@@ -186,43 +198,7 @@ Manajemen item yang dijual di toko dalam game.
 
 ---
 
-## 6️⃣ Manage Animal-Model Relationships (`/api/relationships`)
-
-Manajemen mapping antara hewan dan ML Model.
-
-### List All Relationships
-- **Endpoint**: `GET /relationships`
-- **Auth**: Required (Admin)
-
-### Create Relationship
-- **Endpoint**: `POST /relationships`
-- **Auth**: Required (Admin)
-- **Body**:
-  ```json
-  {
-    "animalId": "uuid-animal",
-    "modelId": "uuid-model"
-  }
-  ```
-
-### Bulk Assign Relationships
-- **Endpoint**: `POST /relationships/bulk`
-- **Auth**: Required (Admin)
-- **Body**:
-  ```json
-  {
-    "modelId": "uuid-model",
-    "animalIds": ["uuid-1", "uuid-2", "uuid-3"]
-  }
-  ```
-
-### Delete Relationship
-- **Endpoint**: `DELETE /relationships/:id`
-- **Auth**: Required (Admin)
-
----
-
-## 7️⃣ Statistics Dashboard (`/api/statistics`)
+## 6️⃣ Statistics Dashboard (`/api/statistics`)
 
 Statistik dan overview performa aplikasi untuk admin.
 
@@ -243,7 +219,7 @@ Statistik dan overview performa aplikasi untuk admin.
 
 ---
 
-## 8️⃣ Leaderboard Management (`/api/leaderboards`)
+## 7️⃣ Leaderboard Management (`/api/leaderboards`)
 
 Manajemen leaderboard dan snapshot.
 
@@ -272,7 +248,7 @@ Manajemen leaderboard dan snapshot.
 
 ---
 
-## 9️⃣ Analytics Dashboard (`/api/analytics`)
+## 8️⃣ Analytics Dashboard (`/api/analytics`)
 
 Data analitik lanjutan untuk admin dashboard.
 
@@ -352,6 +328,23 @@ Data analitik lanjutan untuk admin dashboard.
 
 ---
 
+## 9️⃣ Game Sessions (`/api/game-sessions`)
+
+Manajemen histori sesi permainan.
+
+### List All Game Sessions
+- **Endpoint**: `GET /game-sessions/all`
+- **Auth**: Required (Admin)
+- **Query Params**: `?page=1&limit=10`
+- **Deskripsi**: Menampilkan semua history game session dari seluruh user beserta detail user, hewan, dan model.
+
+### Get Game Session Detail
+- **Endpoint**: `GET /game-sessions/:id`
+- **Auth**: Required (User or Admin)
+- **Deskripsi**: Menampilkan detail spesifik untuk sebuah game session berdasarkan ID. Admin dapat melihat session milik siapa saja.
+
+---
+
 ## 📎 Quick Reference: All Admin Endpoints
 
 | Method | Endpoint | Deskripsi |
@@ -374,18 +367,15 @@ Data analitik lanjutan untuk admin dashboard.
 | `DELETE` | `/ml-models/:id` | Hapus model |
 | `GET` | `/users` | List semua user |
 | `DELETE` | `/users/:id` | Hapus user |
+| `GET` | `/users/:id/inventory` | Inventory milik user |
+| `GET` | `/users/:id/purchases` | Histori pembelian user |
+| `GET` | `/game-sessions/all` | List semua sesi permainan |
+| `GET` | `/game-sessions/:id` | Detail sesi permainan |
 | `GET` | `/shop` | List shop items |
 | `POST` | `/shop` | Buat shop item |
 | `PUT` | `/shop/:id` | Update shop item |
 | `DELETE` | `/shop/:id` | Hapus shop item |
-| `GET` | `/achievements` | List achievements |
-| `POST` | `/achievements` | Buat achievement |
-| `PUT` | `/achievements/:id` | Update achievement |
-| `DELETE` | `/achievements/:id` | Hapus achievement |
-| `GET` | `/relationships` | List animal-model relations |
-| `POST` | `/relationships` | Buat relasi |
-| `POST` | `/relationships/bulk` | Bulk assign relasi |
-| `DELETE` | `/relationships/:id` | Hapus relasi |
+
 | `GET` | `/statistics/overview` | Overview statistik |
 | `GET` | `/statistics/charts` | Data chart |
 | `GET` | `/statistics/detailed` | Statistik detail |

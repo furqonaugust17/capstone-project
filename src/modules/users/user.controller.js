@@ -21,8 +21,24 @@ const destroy = async (req, res) => {
   res.status(200).json(successResponse(null, 200, 'User deleted successfully'));
 };
 
+const inventory = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const result = await userService.getUserInventory(req.params.id, page, limit);
+  res.status(200).json(successResponse(result, 200, 'User inventory fetched successfully'));
+};
+
+const purchases = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const result = await userService.getUserPurchases(req.params.id, page, limit);
+  res.status(200).json(successResponse(result, 200, 'User purchases fetched successfully'));
+};
+
 module.exports = {
   index,
   show,
   destroy,
+  inventory,
+  purchases,
 };

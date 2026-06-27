@@ -29,6 +29,13 @@ model User {
   purchaseHistories   PurchaseHistory[]
   userStatistic       UserStatistic?
   learningProfiles    LearningProfile[]
+  
+  equippedAvatarId String?
+  equippedAvatar   ShopItem? @relation("EquippedAvatar", fields: [equippedAvatarId], references: [id])
+  equippedFrameId  String?
+  equippedFrame    ShopItem? @relation("EquippedFrame", fields: [equippedFrameId], references: [id])
+  equippedThemeId  String?
+  equippedTheme    ShopItem? @relation("EquippedTheme", fields: [equippedThemeId], references: [id])
 
   @@map("users")
 }
@@ -53,7 +60,6 @@ model Animal {
   isActive      Boolean        @default(true)
   createdAt     DateTime      @default(now())
   updatedAt       DateTime        @updatedAt
-  animalModels    AnimalModel[]
   gameSessions    GameSession[]
   learningProfiles LearningProfile[]
 
@@ -74,23 +80,11 @@ model MLModel {
   activatedAt        DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
-  animalModels       AnimalModel[]
   gameSessions       GameSession[]
 
   @@map("ml_models")
 }
 
-model AnimalModel {
-  id        String   @id @default(uuid())
-  animalId  String
-  modelId   String
-  animal    Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
-  model     MLModel  @relation(fields: [modelId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@unique([animalId, modelId])
-  @@map("animal_models")
-}
 
 model GameSession {
   id               String   @id @default(uuid())
@@ -144,6 +138,10 @@ model ShopItem {
   updatedAt         DateTime          @updatedAt
   userInventories   UserInventory[]
   purchaseHistories PurchaseHistory[]
+
+  usersEquippedAvatar User[] @relation("EquippedAvatar")
+  usersEquippedFrame  User[] @relation("EquippedFrame")
+  usersEquippedTheme  User[] @relation("EquippedTheme")
 
   @@map("shop_items")
 }

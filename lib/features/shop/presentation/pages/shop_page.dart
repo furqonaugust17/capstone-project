@@ -202,11 +202,11 @@ class _ShopViewState extends State<ShopView> {
                                 child: GridView.builder(
                                   controller: _scrollController,
                                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
+                                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                    maxCrossAxisExtent: 240,
                                     mainAxisSpacing: 16,
                                     crossAxisSpacing: 16,
-                                    childAspectRatio: 0.75,
+                                    childAspectRatio: 0.85,
                                   ),
                                   itemCount: state is ShopLoaded && !state.hasReachedMax
                                       ? items.length + 2

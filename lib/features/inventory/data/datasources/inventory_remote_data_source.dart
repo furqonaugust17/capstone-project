@@ -10,6 +10,8 @@ import '../../../../core/network/models/paginated_response.dart';
 abstract class InventoryRemoteDataSource {
   Future<List<UserInventoryModel>> getMyInventory();
   Future<List<PurchaseHistoryModel>> getPurchaseHistory();
+  Future<void> equipItem(String itemId, String category);
+  Future<void> unequipItem(String category);
 }
 
 class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
@@ -60,6 +62,39 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
       }
 
       return apiResponse.data!.data;
+    } on DioException catch (e) {
+      throw NetworkErrorHandler.handle(e);
+    } catch (e) {
+      throw UnknownNetworkException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> equipItem(String itemId, String category) async {
+    try {
+      await _apiClient.dio.post(
+        '/inventory/equip',
+        data: {
+          'item_id': itemId,
+          'category': category,
+        },
+      );
+    } on DioException catch (e) {
+      throw NetworkErrorHandler.handle(e);
+    } catch (e) {
+      throw UnknownNetworkException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> unequipItem(String category) async {
+    try {
+      await _apiClient.dio.post(
+        '/inventory/unequip',
+        data: {
+          'category': category,
+        },
+      );
     } on DioException catch (e) {
       throw NetworkErrorHandler.handle(e);
     } catch (e) {

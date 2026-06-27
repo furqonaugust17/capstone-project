@@ -39,3 +39,22 @@ class InventoryError extends InventoryState {
   @override
   List<Object?> get props => [message];
 }
+
+class EquipSuccess extends InventoryState {
+  final String itemId;
+  final String category;
+
+  const EquipSuccess(this.itemId, this.category);
+
+  @override
+  List<Object?> get props => [itemId, category];
+}
+
+class UnequipSuccess extends InventoryState {
+  final String category;
+
+  const UnequipSuccess(this.category);
+
+  @override
+  List<Object?> get props => [category];
+}

@@ -12,6 +12,12 @@ class UserModel {
   final String? avatarUrl;
   final int totalPoint;
   final String role;
+  @JsonKey(name: 'equipped_avatar_url')
+  final String? equippedAvatarUrl;
+  @JsonKey(name: 'equipped_frame_url')
+  final String? equippedFrameUrl;
+  @JsonKey(name: 'equipped_theme_url')
+  final String? equippedThemeUrl;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -23,6 +29,9 @@ class UserModel {
     this.avatarUrl,
     required this.totalPoint,
     required this.role,
+    this.equippedAvatarUrl,
+    this.equippedFrameUrl,
+    this.equippedThemeUrl,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -40,5 +49,8 @@ class UserModel {
         avatarUrl: avatarUrl,
         totalPoint: totalPoint,
         role: role,
+        equippedAvatarUrl: equippedAvatarUrl,
+        equippedFrameUrl: equippedFrameUrl,
+        equippedThemeUrl: equippedThemeUrl,
       );
 }

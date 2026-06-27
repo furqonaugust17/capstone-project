@@ -21,7 +21,6 @@ import 'package:app/features/game_session/presentation/bloc/history/history_cubi
 import 'package:app/features/game_session/presentation/bloc/detail/session_detail_cubit.dart';
 import 'package:app/features/game_session/presentation/pages/history_page.dart';
 import 'package:app/features/game_session/presentation/pages/session_detail_page.dart';
-import 'package:app/features/game_session/presentation/pages/session_detail_page.dart';
 import 'package:app/features/leaderboard/presentation/bloc/leaderboard_cubit.dart';
 import 'package:app/features/leaderboard/presentation/pages/leaderboard_page.dart';
 import 'package:app/features/statistics/presentation/pages/statistics_page.dart';
@@ -42,8 +41,9 @@ class AppRouter {
       final authState = di<AuthBloc>().state;
       final isAuthenticated = authState is Authenticated;
       final isUnauthenticated = authState is Unauthenticated;
-      
-      final isAuthRoute = state.matchedLocation == '/login' ||
+
+      final isAuthRoute =
+          state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
       final isSplashRoute = state.matchedLocation == '/splash';
 
@@ -138,7 +138,8 @@ class AppRouter {
               BlocProvider(create: (_) => di<ClassificationBloc>()),
             ],
             child: DrawingPage(
-              selectedAnimalEntity: selectedAnimal, // Need to update DrawingPage to accept this
+              selectedAnimalEntity:
+                  selectedAnimal, // Need to update DrawingPage to accept this
               drawingMode: drawingMode,
             ),
           );

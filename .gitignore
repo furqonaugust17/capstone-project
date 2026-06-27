@@ -47,3 +47,4 @@ app.*.map.json
 docs/task*
 docs/api-flutter.md
 docs/focus_recovery_and_adaptive_assistance.md
+docs/equip_system_spec.md

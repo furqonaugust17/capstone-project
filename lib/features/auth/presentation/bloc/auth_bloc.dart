@@ -27,6 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthRegisterRequested>(_onAuthRegisterRequested);
     on<AuthLogoutRequested>(_onAuthLogoutRequested);
     on<AuthPointsDeducted>(_onAuthPointsDeducted);
+    on<AuthUserEquipmentUpdated>(_onAuthUserEquipmentUpdated);
   }
 
   Future<void> _onAuthCheckRequested(
@@ -84,6 +85,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = (state as Authenticated).user;
       final updatedUser = user.copyWith(
         totalPoint: user.totalPoint - event.pointsToDeduct,
+      );
+      emit(Authenticated(updatedUser));
+    }
+  }
+
+  void _onAuthUserEquipmentUpdated(
+      AuthUserEquipmentUpdated event, Emitter<AuthState> emit) {
+    if (state is Authenticated) {
+      final user = (state as Authenticated).user;
+      final updatedUser = user.copyWith(
+        equippedAvatarUrl: event.updateAvatar ? event.equippedAvatarUrl : user.equippedAvatarUrl,
+        equippedFrameUrl: event.updateFrame ? event.equippedFrameUrl : user.equippedFrameUrl,
+        equippedThemeUrl: event.updateTheme ? event.equippedThemeUrl : user.equippedThemeUrl,
       );
       emit(Authenticated(updatedUser));
     }

@@ -8,6 +8,9 @@ class UserEntity extends Equatable {
   final String? avatarUrl;
   final int totalPoint;
   final String role;
+  final String? equippedAvatarUrl;
+  final String? equippedFrameUrl;
+  final String? equippedThemeUrl;
 
   const UserEntity({
     required this.id,
@@ -17,6 +20,9 @@ class UserEntity extends Equatable {
     this.avatarUrl,
     required this.totalPoint,
     required this.role,
+    this.equippedAvatarUrl,
+    this.equippedFrameUrl,
+    this.equippedThemeUrl,
   });
 
   UserEntity copyWith({
@@ -27,6 +33,9 @@ class UserEntity extends Equatable {
     String? avatarUrl,
     int? totalPoint,
     String? role,
+    String? equippedAvatarUrl,
+    String? equippedFrameUrl,
+    String? equippedThemeUrl,
   }) {
     return UserEntity(
       id: id ?? this.id,
@@ -36,6 +45,9 @@ class UserEntity extends Equatable {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       totalPoint: totalPoint ?? this.totalPoint,
       role: role ?? this.role,
+      equippedAvatarUrl: equippedAvatarUrl ?? this.equippedAvatarUrl,
+      equippedFrameUrl: equippedFrameUrl ?? this.equippedFrameUrl,
+      equippedThemeUrl: equippedThemeUrl ?? this.equippedThemeUrl,
     );
   }
 
@@ -48,5 +60,8 @@ class UserEntity extends Equatable {
         avatarUrl,
         totalPoint,
         role,
+        equippedAvatarUrl,
+        equippedFrameUrl,
+        equippedThemeUrl,
       ];
 }

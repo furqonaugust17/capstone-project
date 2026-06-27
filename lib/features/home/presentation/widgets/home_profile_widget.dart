@@ -5,6 +5,7 @@ import 'package:app/core/theme/app_text_styles.dart';
 import 'package:app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:app/shared/widgets/equipped_avatar_widget.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeProfileWidget extends StatelessWidget {
@@ -34,23 +35,10 @@ class HomeProfileWidget extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircleAvatar(
-                    backgroundColor: AppColors.primary,
-                    radius: 20,
-                    backgroundImage: user.avatarUrl != null
-                        ? NetworkImage(user.avatarUrl!)
-                        : null,
-                    child: user.avatarUrl == null
-                        ? Text(
-                            user.displayName?.isNotEmpty == true
-                                ? user.displayName![0].toUpperCase()
-                                : user.username[0].toUpperCase(),
-                            style: AppTextStyles.bodyLarge.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : null,
+                  EquippedAvatarWidget(
+                    size: 44,
+                    avatarUrl: user.equippedAvatarUrl ?? user.avatarUrl,
+                    frameUrl: user.equippedFrameUrl,
                   ),
                   const SizedBox(width: 12),
                   Column(

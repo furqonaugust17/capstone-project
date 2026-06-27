@@ -5,6 +5,8 @@ import 'data/repositories/inventory_repository_impl.dart';
 import 'domain/repositories/inventory_repository.dart';
 import 'domain/usecases/get_my_inventory_usecase.dart';
 import 'domain/usecases/get_purchase_history_usecase.dart';
+import 'domain/usecases/equip_item_usecase.dart';
+import 'domain/usecases/unequip_item_usecase.dart';
 import 'presentation/bloc/inventory_cubit.dart';
 
 Future<void> initInventoryFeature(GetIt di) async {
@@ -19,9 +21,26 @@ Future<void> initInventoryFeature(GetIt di) async {
   );
 
   // Use cases
-  di.registerLazySingleton(() => GetMyInventoryUseCase(di<InventoryRepository>()));
-  di.registerLazySingleton(() => GetPurchaseHistoryUseCase(di<InventoryRepository>()));
+  di.registerLazySingleton(
+    () => GetMyInventoryUseCase(di<InventoryRepository>()),
+  );
+  di.registerLazySingleton(
+    () => GetPurchaseHistoryUseCase(di<InventoryRepository>()),
+  );
+  di.registerLazySingleton(
+    () => EquipItemUseCase(di<InventoryRepository>()),
+  );
+  di.registerLazySingleton(
+    () => UnequipItemUseCase(di<InventoryRepository>()),
+  );
 
   // Blocs
-  di.registerFactory(() => InventoryCubit(di<GetMyInventoryUseCase>(), di<GetPurchaseHistoryUseCase>()));
+  di.registerFactory(
+    () => InventoryCubit(
+      di<GetMyInventoryUseCase>(),
+      di<GetPurchaseHistoryUseCase>(),
+      di<EquipItemUseCase>(),
+      di<UnequipItemUseCase>(),
+    ),
+  );
 }

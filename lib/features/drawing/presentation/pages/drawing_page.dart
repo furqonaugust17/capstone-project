@@ -57,7 +57,10 @@ class _DrawingPageState extends State<DrawingPage> {
     if (!mounted) return;
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => const DrawingExampleDialog(),
+      builder: (dialogContext) => DrawingExampleDialog(
+        imagePath: widget.selectedAnimalEntity?.hintImageUrl ?? _exampleAssetPath(widget.selectedAnimalEntity?.name),
+        funFact: widget.selectedAnimalEntity?.description,
+      ),
     );
   }
 

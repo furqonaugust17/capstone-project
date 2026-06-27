@@ -19,4 +19,14 @@ class InventoryRepositoryImpl implements InventoryRepository {
     final models = await _remoteDataSource.getPurchaseHistory();
     return models.map((e) => e.toEntity()).toList();
   }
+
+  @override
+  Future<void> equipItem(String itemId, String category) async {
+    await _remoteDataSource.equipItem(itemId, category);
+  }
+
+  @override
+  Future<void> unequipItem(String category) async {
+    await _remoteDataSource.unequipItem(category);
+  }
 }

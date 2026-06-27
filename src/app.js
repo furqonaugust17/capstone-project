@@ -44,9 +44,10 @@ const authLimiter = rateLimit({
   message: { success: false, message: 'Too many login attempts from this IP, please try again after 15 minutes' }
 });
 
-app.use('/api/', globalLimiter);
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/register', authLimiter);
+// app.use('/api/', globalLimiter);
+// app.use('/api/auth/login', authLimiter);
+// app.use('/api/auth/register', authLimiter);
+
 
 // Logging
 // Stream morgan logs to winston

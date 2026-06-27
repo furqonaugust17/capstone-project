@@ -4,9 +4,10 @@ const { uploadToR2, deleteFromR2 } = require('../../utils/cloudflare');
 const { env } = require('../../config/env');
 const path = require('path');
 
-const getAllShopItems = async (page = 1, limit = 10, category, rarity) => {
+const getAllShopItems = async (page = 1, limit = 10, category, rarity, includeInactive = false) => {
   const skip = (page - 1) * limit;
-  const where = { isActive: true };
+  const where = {};
+  if (!includeInactive) where.isActive = true;
   if (category) where.category = category;
   if (rarity) where.rarity = rarity;
 
@@ -23,12 +24,12 @@ const getAllShopItems = async (page = 1, limit = 10, category, rarity) => {
   return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
 };
 
-const getShopItemById = async (id) => {
+const getShopItemById = async (id, includeInactive = false) => {
   const item = await prisma.shopItem.findUnique({
     where: { id },
   });
 
-  if (!item || !item.isActive) {
+  if (!item || (!includeInactive && !item.isActive)) {
     const error = new Error('Shop item not found');
     error.statusCode = 404;
     throw error;

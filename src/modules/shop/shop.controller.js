@@ -7,13 +7,15 @@ const index = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const { category, rarity } = req.query;
+  const includeInactive = req.user?.role === 'ADMIN';
 
-  const result = await shopService.getAllShopItems(page, limit, category, rarity);
+  const result = await shopService.getAllShopItems(page, limit, category, rarity, includeInactive);
   res.status(200).json(successResponse(result, 200, 'Shop items fetched successfully'));
 };
 
 const show = async (req, res) => {
-  const item = await shopService.getShopItemById(req.params.id);
+  const includeInactive = req.user?.role === 'ADMIN';
+  const item = await shopService.getShopItemById(req.params.id, includeInactive);
   res.status(200).json(successResponse(item, 200, 'Shop item fetched successfully'));
 };
 

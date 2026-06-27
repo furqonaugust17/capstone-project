@@ -57,6 +57,10 @@ model Animal {
   description   String?
   thumbnailUrl  String?
   hintImageUrl  String?
+  traceImageUrl String?
+  funFact       String?
+  drawingTips   String[]
+  difficulty    String         @default("easy")
   isActive      Boolean        @default(true)
   createdAt     DateTime      @default(now())
   updatedAt       DateTime        @updatedAt

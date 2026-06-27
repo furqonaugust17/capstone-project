@@ -7,11 +7,11 @@ const path = require('path');
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  const allowedMimes = ['image/jpeg', 'image/png', 'application/x-tflite', 'application/octet-stream'];
+  const allowedMimes = ['image/jpeg', 'image/png', 'image/svg+xml', 'application/x-tflite', 'application/octet-stream'];
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPG, PNG, and TFLITE are allowed.'), false);
+    cb(new Error('Invalid file type. Only JPG, PNG, SVG, and TFLITE are allowed.'), false);
   }
 };
 
@@ -43,6 +43,7 @@ const uploadFields = multer({
 }).fields([
   { name: 'thumbnail', maxCount: 1 },
   { name: 'hintImage', maxCount: 1 },
+  { name: 'traceImage', maxCount: 1 },
 ]);
 
 module.exports = {

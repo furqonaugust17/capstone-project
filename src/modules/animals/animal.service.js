@@ -41,11 +41,15 @@ const createAnimal = async (data, files) => {
     data: {
       name: data.name,
       description: data.description,
+      funFact: data.funFact,
+      drawingTips: data.drawingTips || [],
+      difficulty: data.difficulty || 'easy',
     },
   });
 
   let thumbnailUrl = null;
   let hintImageUrl = null;
+  let traceImageUrl = null;
   let shouldUpdate = false;
 
   if (files && files.thumbnail && files.thumbnail.length > 0) {
@@ -64,12 +68,21 @@ const createAnimal = async (data, files) => {
     shouldUpdate = true;
   }
 
+  if (files && files.traceImage && files.traceImage.length > 0) {
+    const file = files.traceImage[0];
+    const ext = path.extname(file.originalname);
+    const key = `animals/traces/${newAnimal.id}${ext}`;
+    traceImageUrl = await uploadToR2(file.buffer, key, file.mimetype);
+    shouldUpdate = true;
+  }
+
   if (shouldUpdate) {
     newAnimal = await prisma.animal.update({
       where: { id: newAnimal.id },
       data: {
         thumbnailUrl,
         hintImageUrl,
+        traceImageUrl,
       },
     });
   }
@@ -87,6 +100,7 @@ const updateAnimal = async (id, data, files) => {
 
   let thumbnailUrl = animal.thumbnailUrl;
   let hintImageUrl = animal.hintImageUrl;
+  let traceImageUrl = animal.traceImageUrl;
 
   if (files && files.thumbnail && files.thumbnail.length > 0) {
     if (thumbnailUrl) {
@@ -110,12 +124,25 @@ const updateAnimal = async (id, data, files) => {
     hintImageUrl = await uploadToR2(file.buffer, key, file.mimetype);
   }
 
+  if (files && files.traceImage && files.traceImage.length > 0) {
+    if (traceImageUrl) {
+      const oldKey = traceImageUrl.replace(`${env.R2_PUBLIC_URL}/`, '');
+      await deleteFromR2(oldKey).catch(() => {});
+    }
+    const file = files.traceImage[0];
+    const ext = path.extname(file.originalname);
+    const key = `animals/traces/${id}${ext}`;
+    traceImageUrl = await uploadToR2(file.buffer, key, file.mimetype);
+  }
+
   const updatedAnimal = await prisma.animal.update({
     where: { id },
     data: {
       ...data,
       thumbnailUrl,
       hintImageUrl,
+      traceImageUrl,
+      // data contains name, description, funFact, drawingTips, difficulty, isActive from zod validation
     },
   });
 

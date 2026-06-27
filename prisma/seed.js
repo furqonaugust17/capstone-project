@@ -32,24 +32,59 @@ async function main() {
   const animals = [
     {
       name: 'Kucing',
-      description: 'Kucing peliharaan dengan bulu yang lembut.',
+      description: 'Hewan peliharaan yang lucu dan menggemaskan dengan bulu lembut.',
+      funFact: 'Kucing menghabiskan sekitar 70% dari hidupnya untuk tidur.',
+      drawingTips: [
+        'Mulai dengan bentuk lingkaran untuk kepala dan oval untuk badan.',
+        'Gunakan dua segitiga kecil untuk telinga di atas kepala.',
+        'Tambahkan kumis panjang di area pipi agar terlihat lebih nyata.'
+      ],
+      difficulty: 'easy'
     },
     {
       name: 'Sapi',
-      description: 'Hewan ternak herbivora penghasil susu dan daging.',
+      description: 'Hewan herbivora bertubuh besar yang menghasilkan susu segar.',
+      funFact: 'Sapi memiliki memori yang sangat baik dan bisa mengingat teman-teman mereka.',
+      drawingTips: [
+        'Gambar bentuk kotak atau persegi panjang tumpul untuk badannya.',
+        'Tambahkan corak belang-belang asimetris khas sapi perah.',
+        'Jangan lupa gambar moncong hidung yang besar dan ekor dengan ujung berbulu.'
+      ],
+      difficulty: 'medium'
     },
     {
       name: 'Bebek',
-      description: 'Unggas air berkaki selaput yang pandai berenang.',
+      description: 'Unggas air yang pandai berenang dengan kakinya yang berselaput.',
+      funFact: 'Bulu bebek dilapisi minyak khusus yang membuatnya tahan air.',
+      drawingTips: [
+        'Bentuk dasar bebek menyerupai angka dua (2).',
+        'Gambarkan paruh yang pipih dan memanjang ke depan.',
+        'Buat kakinya berselaput dengan bentuk tiga jari menyatu.'
+      ],
+      difficulty: 'easy'
     },
     {
       name: 'Ikan',
-      description: 'Hewan air yang bernapas menggunakan insang.',
+      description: 'Hewan air yang bernapas dengan insang dan memiliki sisik.',
+      funFact: 'Beberapa spesies ikan mas bisa hidup hingga puluhan tahun.',
+      drawingTips: [
+        'Buat bentuk oval memanjang untuk badan utamanya.',
+        'Tambahkan sirip segitiga di punggung, bawah badan, dan ekor.',
+        'Gambarkan sisik menggunakan garis-garis melengkung (seperti huruf C).'
+      ],
+      difficulty: 'easy'
     },
     {
       name: 'Lumba-lumba',
-      description: 'Mamalia laut yang sangat cerdas dan ramah.',
-    }
+      description: 'Mamalia laut yang sangat cerdas, lincah, dan ramah terhadap manusia.',
+      funFact: 'Lumba-lumba berkomunikasi satu sama lain menggunakan siulan yang unik.',
+      drawingTips: [
+        'Gunakan bentuk melengkung seperti pisang untuk badannya.',
+        'Buat sirip punggung melengkung dan paruh hidung yang sedikit menonjol.',
+        'Gambar garis mulut yang terlihat seperti selalu tersenyum.'
+      ],
+      difficulty: 'medium'
+    },
   ];
 
   for (const animalData of animals) {
@@ -63,24 +98,43 @@ async function main() {
       });
       console.log(`✅ Animal created: ${animalData.name}`);
     } else {
-      console.log(`ℹ️ Animal already exists: ${animalData.name}`);
+      await prisma.animal.update({
+        where: { id: existing.id },
+        data: {
+          funFact: animalData.funFact,
+          drawingTips: animalData.drawingTips,
+          difficulty: animalData.difficulty,
+        }
+      });
+      console.log(`ℹ️ Animal already exists (updated fields): ${animalData.name}`);
     }
   }
 
+
+
   // 3. Create Dummy Users (Players)
+  const realisticPlayers = [
+    { username: 'BudiSantoso', displayName: 'Budi Santoso' },
+    { username: 'SitiAisyah', displayName: 'Siti Aisyah' },
+    { username: 'AhmadFauzi', displayName: 'Ahmad Fauzi' },
+    { username: 'RinaWijaya', displayName: 'Rina Wijaya' },
+    { username: 'DimasPratama', displayName: 'Dimas Pratama' },
+  ];
+
   const dummyPlayers = [];
-  for (let i = 1; i <= 5; i++) {
-    const playerEmail = `player${i}@animaldrawing.com`;
+  for (const p of realisticPlayers) {
+    const playerEmail = `${p.username.toLowerCase()}@animaldrawing.com`;
     let player = await prisma.user.findFirst({ where: { email: playerEmail } });
     if (!player) {
       player = await prisma.user.create({
         data: {
-          username: `player${i}`,
+          username: p.username,
           email: playerEmail,
-          passwordHash, // using same password hash as admin for simplicity
+          passwordHash,
           role: 'USER',
-          displayName: `Player ${i}`,
-          totalPoint: Math.floor(Math.random() * 1000) + 200,
+          displayName: p.displayName,
+          totalPoint: Math.floor(Math.random() * 2000) + 500,
+          avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.username}`
         }
       });
       console.log(`✅ Dummy player created: ${player.username}`);
@@ -108,13 +162,13 @@ async function main() {
   const existingSessions = await prisma.gameSession.count();
   if (existingSessions < 20) {
     const allAnimals = await prisma.animal.findMany();
-    
+
     // Create random sessions for the past 7 days
     if (allAnimals.length > 0 && dummyPlayers.length > 0) {
       for (let i = 0; i < 50; i++) {
         const randomPlayer = dummyPlayers[Math.floor(Math.random() * dummyPlayers.length)];
         const randomAnimal = allAnimals[Math.floor(Math.random() * allAnimals.length)];
-        
+
         const randomDaysAgo = Math.floor(Math.random() * 7); // 0 to 6 days ago
         const sessionDate = new Date();
         sessionDate.setDate(sessionDate.getDate() - randomDaysAgo);
@@ -142,10 +196,12 @@ async function main() {
 
   // 6. Create Dummy Shop Items
   const shopItems = [
-    { name: 'Red Theme', description: 'Red app theme', price: 100, category: 'THEME', rarity: 'COMMON' },
-    { name: 'Blue Theme', description: 'Blue app theme', price: 200, category: 'THEME', rarity: 'RARE' },
-    { name: 'Cat Avatar', description: 'Cute cat avatar', price: 500, category: 'AVATAR', rarity: 'EPIC' },
-    { name: 'Golden Frame', description: 'Gold profile frame', price: 1000, category: 'FRAME', rarity: 'LEGENDARY' }
+    { name: 'Dark Mode Theme', description: 'Elegan dan ramah di mata untuk bermain malam hari', price: 100, category: 'THEME', rarity: 'COMMON', imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=dark' },
+    { name: 'Ocean Blue Theme', description: 'Tema laut biru yang menyegarkan pikiran', price: 200, category: 'THEME', rarity: 'RARE', imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=ocean' },
+    { name: 'Cute Cat Avatar', description: 'Avatar kucing lucu yang cocok untuk profilmu', price: 500, category: 'AVATAR', rarity: 'EPIC', imageUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Cat' },
+    { name: 'Fierce Tiger Avatar', description: 'Tunjukkan jiwa petarungmu dengan avatar ini', price: 750, category: 'AVATAR', rarity: 'EPIC', imageUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tiger' },
+    { name: 'Golden Dragon Frame', description: 'Bingkai naga emas yang melegenda', price: 1000, category: 'FRAME', rarity: 'LEGENDARY', imageUrl: 'https://api.dicebear.com/7.x/icons/svg?seed=Dragon' },
+    { name: 'Wooden Classic Frame', description: 'Bingkai kayu klasik yang estetik', price: 150, category: 'FRAME', rarity: 'COMMON', imageUrl: 'https://api.dicebear.com/7.x/icons/svg?seed=Wood' }
   ];
 
   for (const item of shopItems) {
@@ -155,24 +211,6 @@ async function main() {
       console.log(`✅ Shop Item created: ${item.name}`);
     } else {
       console.log(`ℹ️ Shop Item already exists: ${item.name}`);
-    }
-  }
-
-  // 7. Create Dummy Achievements
-  const achievements = [
-    { name: 'First Steps', description: 'Play your first 5 games', rewardPoint: 100, triggerType: 'TOTAL_GAMES', triggerValue: 5 },
-    { name: 'Dedicated Artist', description: 'Play 50 games', rewardPoint: 500, triggerType: 'TOTAL_GAMES', triggerValue: 50 },
-    { name: 'High Scorer', description: 'Reach 1000 total score', rewardPoint: 200, triggerType: 'TOTAL_SCORE', triggerValue: 1000 },
-    { name: 'Laser Focus', description: 'Achieve an average focus score of 0.8', rewardPoint: 300, triggerType: 'FOCUS_SCORE', triggerValue: 0 } // use 0 for easy testing, ideally 80 if percentage
-  ];
-
-  for (const ach of achievements) {
-    const existing = await prisma.achievement.findFirst({ where: { name: ach.name } });
-    if (!existing) {
-      await prisma.achievement.create({ data: ach });
-      console.log(`✅ Achievement created: ${ach.name}`);
-    } else {
-      console.log(`ℹ️ Achievement already exists: ${ach.name}`);
     }
   }
 

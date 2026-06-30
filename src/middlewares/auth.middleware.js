@@ -3,10 +3,6 @@
 const { verifyAccessToken, verifyRefreshToken } = require('../utils/jwt');
 const { errorResponse } = require('../utils/response');
 const logger = require('../utils/logger');
-const { PrismaClient } = require('@prisma/client');
-const { PrismaPg } = require('@prisma/adapter-pg');
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter: adapter });
 
 /**
  * Auth middleware – verifies JWT access token from the Authorization header.

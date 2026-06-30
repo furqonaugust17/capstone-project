@@ -14,3 +14,5 @@ README.md
 docs/
 docker-compose.yml
 Dockerfile
+.dockerignore
+db_capstone.sql

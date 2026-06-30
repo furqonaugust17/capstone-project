@@ -17,8 +17,8 @@ const app = express();
 app.use(helmet());
 
 // CORS whitelist setup
-const allowedOrigins = env.NODE_ENV === 'production' 
-  ? ['https://bima.example.com', 'https://admin.bima.example.com'] 
+const allowedOrigins = env.NODE_ENV === 'production'
+  ? ['https://admin-capstone.furqonaugust.site']
   : ['http://localhost:5173', 'http://localhost:3000', '*']; // adjust local origins
 
 app.use(cors({

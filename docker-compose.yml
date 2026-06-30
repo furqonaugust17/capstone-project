@@ -1,59 +1,62 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: bima-backend
+    container_name: capstone-backend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3308:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DATABASE_URL=postgres://user:password@postgres:5432/bima_db
-      - JWT_SECRET=your_jwt_secret_here
-      - REDIS_URL=redis://redis:6379
-      # Tambahkan env variabel lainnya di file .env yang di-load
+      - DATABASE_URL=postgres://postgres:postgres123@postgres:5432/capstone_project
     env_file:
       - .env
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
-      - bima-network
+      - capstone-network
 
   postgres:
-    image: postgres:15-alpine
-    container_name: bima-postgres
+    image: postgres:16-alpine
+    container_name: capstone-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: bima_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: capstone_project
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - bima-postgres-data:/var/lib/postgresql/data
+      - capstone-postgres-data:/var/lib/postgresql/data
+      - ./db_capstone.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d capstone_project"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
-      - bima-network
+      - capstone-network
 
   redis:
     image: redis:7-alpine
-    container_name: bima-redis
+    container_name: capstone-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
-      - bima-redis-data:/data
+      - capstone-redis-data:/data
     networks:
-      - bima-network
+      - capstone-network
 
 volumes:
-  bima-postgres-data:
-  bima-redis-data:
+  capstone-postgres-data:
+  capstone-redis-data:
 
 networks:
-  bima-network:
+  capstone-network:
     driver: bridge

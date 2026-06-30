@@ -2,8 +2,8 @@
 
 > **Aplikasi:** AniDraw — Educational Animal Drawing Game  
 > **Platform:** Android  
-> **Versi Dokumen:** 1.0  
-> **Terakhir Diperbarui:** 26 Juni 2026
+> **Versi Dokumen:** 1.1  
+> **Terakhir Diperbarui:** 27 Juni 2026
 
 ---
 
@@ -27,7 +27,8 @@
    - 7.2 [Papan Peringkat (Leaderboard)](#72-papan-peringkat-leaderboard)
    - 7.3 [Toko (Shop)](#73-toko-shop)
    - 7.4 [Inventori](#74-inventori)
-   - 7.5 [Statistik](#75-statistik)
+   - 7.5 [Sistem Equip Item (Gunakan Item)](#75-sistem-equip-item-gunakan-item)
+   - 7.6 [Statistik](#76-statistik)
 8. [Sistem Skor](#8-sistem-skor)
 9. [Tips Menggambar agar Skor Tinggi](#9-tips-menggambar-agar-skor-tinggi)
 10. [Tanya Jawab (FAQ)](#10-tanya-jawab-faq)
@@ -58,6 +59,7 @@
 | Galeri Riwayat | Melihat kembali riwayat gambar dan skor sebelumnya |
 | Papan Peringkat | Membandingkan skor dengan pengguna lain |
 | Toko & Inventori | Membeli dan mengelola item dalam game |
+| Equip Item | Menggunakan item Avatar, Frame, dan Theme yang dimiliki |
 
 ---
 
@@ -143,7 +145,7 @@ Halaman Utama adalah pusat navigasi utama aplikasi. Dari halaman ini Anda dapat 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                                                         │
-│    [Profil]            ANIDRAW                          │
+│    [Profil + Frame]    ANIDRAW                          │
 │                  "Ayo belajar menggambar                │
 │                   hewan lucu dengan cara                │
 │                   yang menyenangkan!"                   │
@@ -163,7 +165,9 @@ Halaman Utama adalah pusat navigasi utama aplikasi. Dari halaman ini Anda dapat 
 | **Peringkat** | Melihat papan peringkat pemain |
 | **Toko** | Mengakses toko untuk membeli item |
 | **Inventori** | Melihat item yang sudah dimiliki |
-| **Profil** | Menampilkan informasi profil pengguna |
+| **Profil** | Menampilkan informasi profil pengguna (dengan Avatar & Frame yang sedang digunakan) |
+
+> **Fitur Tema (Theme):** Jika Anda telah menggunakan (*equip*) item bertipe **Theme** dari Inventori, latar belakang Halaman Utama akan berubah menjadi gambar tema tersebut secara *fullscreen*, menggantikan dekorasi standar.
 
 ---
 
@@ -268,8 +272,18 @@ Halaman menggambar adalah inti dari pengalaman bermain AniDraw. Di sini Anda aka
 | **Eraser (Penghapus)** | 🧹 | Menghapus bagian gambar yang sudah dibuat |
 | **Undo (Batalkan)** | ↩ | Membatalkan satu goresan terakhir |
 | **Clear (Hapus Semua)** | 🗑 | Menghapus semua gambar di kanvas sekaligus |
-| **Contoh** | 💡 | Menampilkan dialog contoh gambar hewan sebagai referensi |
+| **Contoh** | 💡 | Menampilkan dialog contoh gambar hewan (layout 3 kolom) |
 | **Selesai (Finish)** | ✅ | Mengirim gambar untuk diklasifikasi oleh AI |
+
+#### Dialog Contoh Gambar
+
+Saat menekan tombol **CONTOH**, akan muncul dialog *popup* dengan layout landscape 3 kolom:
+
+| Kolom | Konten |
+|---|---|
+| **Kiri** | Gambar contoh hewan yang sedang digambar |
+| **Tengah** | Panduan langkah-langkah "Cara Menggambar" dalam 3 langkah bernomor |
+| **Kanan** | Kartu fakta menarik "Tahukah Kamu?" tentang hewan tersebut, beserta tombol **LANJUT GAMBAR!** |
 
 #### Cara Menggambar:
 
@@ -375,13 +389,60 @@ Toko menyediakan berbagai item menarik yang dapat dibeli menggunakan poin yang d
 
 Akses melalui: **Halaman Utama → Inventori** (tombol di pojok kanan bawah)
 
-Halaman Inventori menampilkan semua item yang telah Anda beli dari Toko. Di sini Anda dapat:
-- Melihat koleksi item yang dimiliki
-- Mengatur atau menggunakan item tertentu
+Halaman Inventori menampilkan semua item yang telah Anda beli dari Toko. Halaman ini memiliki **dua tab**:
+
+| Tab | Fungsi |
+|---|---|
+| **Item Saya** | Menampilkan grid semua item yang dimiliki beserta tombol **Gunakan** / **Dilepas** |
+| **Riwayat Pembelian** | Daftar kronologis semua transaksi pembelian dari Toko |
+
+#### Tampilan Item
+
+Setiap kartu item di tab "Item Saya" menampilkan:
+- **Gambar item** di bagian atas
+- **Nama item** dan **label kategori** (Avatar / Frame / Theme)
+- **Tombol aksi:**
+  - **"Gunakan"** (warna biru) — Jika item belum dipakai, tekan untuk menggunakannya
+  - **"Dilepas"** (warna abu-abu) — Jika item sedang dipakai, tekan untuk melepasnya
+
+> Item yang sedang digunakan (*equipped*) akan ditandai dengan **border biru** pada kartunya.
+
+#### Notifikasi
+
+Setelah berhasil memasang atau melepas item, akan muncul **popup dialog** yang memberitahukan status operasi (berhasil atau gagal).
 
 ---
 
-### 7.5 Statistik
+### 7.5 Sistem Equip Item (Gunakan Item)
+
+Fitur ini memungkinkan Anda **menggunakan item** yang telah dibeli dari Toko agar efeknya terlihat di dalam aplikasi. Terdapat tiga kategori item yang dapat digunakan:
+
+| Kategori | Efek Saat Digunakan |
+|---|---|
+| **Avatar** | Mengubah gambar profil Anda di widget profil Halaman Utama |
+| **Frame** | Menambahkan bingkai dekoratif di sekitar avatar profil Anda |
+| **Theme** | Mengubah latar belakang Halaman Utama menjadi gambar tema secara *fullscreen* |
+
+#### Cara Menggunakan Item:
+
+1. Buka halaman **Inventori** melalui Halaman Utama.
+2. Pada tab **"Item Saya"**, temukan item yang ingin Anda gunakan.
+3. Ketuk tombol **"Gunakan"** pada kartu item tersebut.
+4. Akan muncul popup **"Item berhasil digunakan!"** jika berhasil.
+5. Efek item akan langsung terlihat (misalnya avatar berubah, atau latar belakang beranda berubah).
+
+#### Cara Melepas Item:
+
+1. Pada tab **"Item Saya"**, temukan item yang sedang dipakai (ditandai border biru dan tombol "Dilepas").
+2. Ketuk tombol **"Dilepas"** pada kartu item tersebut.
+3. Akan muncul popup **"Item berhasil dilepas!"** jika berhasil.
+4. Item akan kembali ke kondisi tidak dipakai dan efeknya akan hilang.
+
+> **Catatan:** Anda hanya dapat menggunakan **satu item per kategori** dalam satu waktu. Jika Anda menggunakan Avatar baru, Avatar sebelumnya akan otomatis terlepas.
+
+---
+
+### 7.6 Statistik
 
 Akses melalui: **Halaman Utama → Statistik** (jika tersedia)
 
@@ -475,6 +536,12 @@ Berikut beberapa tips agar gambar Anda mendapatkan skor kemiripan yang tinggi:
 
 ### Q: Apakah data gambar saya tersimpan?
 **A:** Ya, setiap sesi menggambar yang diselesaikan akan tersimpan dan dapat dilihat kembali melalui fitur **Galeri** di halaman utama.
+
+### Q: Bagaimana cara menggunakan (equip) item yang sudah dibeli?
+**A:** Buka halaman **Inventori** → tab "Item Saya" → ketuk tombol **"Gunakan"** pada item yang diinginkan. Item yang sedang dipakai ditandai dengan border biru dan tombol akan berubah menjadi **"Dilepas"**.
+
+### Q: Apa itu item bertipe Theme dan bagaimana efeknya?
+**A:** Item **Theme** mengubah latar belakang Halaman Utama menjadi gambar tema secara *fullscreen*. Jika tidak ada Theme yang dipakai, halaman utama menampilkan dekorasi standar (gambar coretan kucing, matahari, dan burung).
 
 ### Q: Kenapa layar selalu dalam posisi landscape?
 **A:** Aplikasi dirancang khusus untuk mode **landscape** (mendatar) agar area kanvas menggambar lebih luas dan nyaman digunakan.

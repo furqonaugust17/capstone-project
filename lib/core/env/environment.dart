@@ -16,8 +16,8 @@ class Environment {
   );
   static const production = Environment._(
     flavor: Flavor.production,
-    apiBaseUrl: 'https://api.example.com/api',
+    apiBaseUrl: 'https://backend-capstone.furqonaugust.site/api',
   );
 
-  static Environment current = development;
+  static Environment current = production;
 }

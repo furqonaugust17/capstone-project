@@ -12,6 +12,14 @@ AnimalModel _$AnimalModelFromJson(Map<String, dynamic> json) => AnimalModel(
   description: json['description'] as String?,
   thumbnailUrl: json['thumbnailUrl'] as String?,
   hintImageUrl: json['hintImageUrl'] as String?,
+  difficulty: json['difficulty'] as String? ?? 'easy',
+  funFact: json['funFact'] as String?,
+  drawingTips:
+      (json['drawingTips'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      [],
+  traceImageUrl: json['traceImageUrl'] as String?,
   isActive: json['isActive'] as bool,
   baseScore: (json['baseScore'] as num?)?.toInt() ?? 100,
   createdAt: DateTime.parse(json['createdAt'] as String),
@@ -25,6 +33,10 @@ Map<String, dynamic> _$AnimalModelToJson(AnimalModel instance) =>
       'description': instance.description,
       'thumbnailUrl': instance.thumbnailUrl,
       'hintImageUrl': instance.hintImageUrl,
+      'difficulty': instance.difficulty,
+      'funFact': instance.funFact,
+      'drawingTips': instance.drawingTips,
+      'traceImageUrl': instance.traceImageUrl,
       'isActive': instance.isActive,
       'baseScore': instance.baseScore,
       'createdAt': instance.createdAt.toIso8601String(),

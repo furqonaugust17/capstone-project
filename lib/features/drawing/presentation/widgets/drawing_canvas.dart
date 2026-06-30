@@ -10,14 +10,14 @@ import '../painter/sketch_painter.dart';
 class DrawingCanvas extends StatefulWidget {
   final DrawingController controller;
   final Color backgroundColor;
-  final String? traceAssetPath;
+  final String? traceImagePath;
   final double traceOpacity;
 
   const DrawingCanvas({
     super.key,
     required this.controller,
     this.backgroundColor = const Color(0xFFF7F9FC),
-    this.traceAssetPath,
+    this.traceImagePath,
     this.traceOpacity = 0.35,
   });
 
@@ -89,7 +89,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                   //    surface so the child can see the guide, but OUTSIDE
                   //    RepaintBoundary so it is excluded from capture.
                   //    IgnorePointer ensures it doesn't block drawing gestures.
-                  if (widget.traceAssetPath != null)
+                  if (widget.traceImagePath != null)
                     IgnorePointer(
                       child: Center(
                         child: Opacity(
@@ -97,10 +97,15 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                           child: FractionallySizedBox(
                             widthFactor: 1.2,
                             heightFactor: 1.2,
-                            child: Image.asset(
-                              widget.traceAssetPath!,
-                              fit: BoxFit.contain,
-                            ),
+                            child: widget.traceImagePath!.startsWith('http')
+                                ? Image.network(
+                                    widget.traceImagePath!,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Image.asset(
+                                    widget.traceImagePath!,
+                                    fit: BoxFit.contain,
+                                  ),
                           ),
                         ),
                       ),

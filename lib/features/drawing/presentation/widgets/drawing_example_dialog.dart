@@ -6,8 +6,14 @@ import 'package:app/core/theme/app_text_styles.dart';
 class DrawingExampleDialog extends StatelessWidget {
   final String? imagePath;
   final String? funFact;
+  final List<String>? drawingTips;
 
-  const DrawingExampleDialog({super.key, this.imagePath, this.funFact});
+  const DrawingExampleDialog({
+    super.key,
+    this.imagePath,
+    this.funFact,
+    this.drawingTips,
+  });
 
   Widget _buildStep(int number, String text) {
     return Row(
@@ -46,6 +52,15 @@ class DrawingExampleDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Gunakan tips dinamis, atau fallback ke tips default jika kosong
+    final tipsToDisplay = (drawingTips != null && drawingTips!.isNotEmpty)
+        ? drawingTips!
+        : [
+            'Perhatikan bentuk dasar hewan dari gambar di samping.',
+            'Gunakan alat pensil untuk menggambar kerangka secara perlahan.',
+            'Jika ada kesalahan, gunakan alat penghapus di panel bawah.'
+          ];
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
@@ -197,22 +212,14 @@ class DrawingExampleDialog extends StatelessWidget {
                             Expanded(
                               child: SingleChildScrollView(
                                 child: Column(
-                                  children: [
-                                    _buildStep(
-                                      1,
-                                      'Perhatikan bentuk dasar hewan dari gambar di samping.',
-                                    ),
-                                    const SizedBox(height: 12),
-                                    _buildStep(
-                                      2,
-                                      'Gunakan alat pensil untuk menggambar kerangka secara perlahan.',
-                                    ),
-                                    const SizedBox(height: 12),
-                                    _buildStep(
-                                      3,
-                                      'Jika ada kesalahan, gunakan alat penghapus di panel bawah.',
-                                    ),
-                                  ],
+                                  children: tipsToDisplay.asMap().entries.map((entry) {
+                                    final index = entry.key;
+                                    final text = entry.value;
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 12.0),
+                                      child: _buildStep(index + 1, text),
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                             ),

@@ -12,6 +12,9 @@ import 'package:app/features/auth/presentation/bloc/auth_bloc.dart' as app_auth;
 import 'package:app/features/auth/presentation/bloc/auth_event.dart'
     as app_auth;
 
+import 'package:app/features/inventory/presentation/bloc/inventory_cubit.dart';
+import 'package:app/features/inventory/presentation/bloc/inventory_state.dart';
+
 class ShopItemDetailPage extends StatelessWidget {
   final ShopItemEntity item;
 
@@ -19,8 +22,11 @@ class ShopItemDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => di<PurchaseCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => di<PurchaseCubit>()),
+        BlocProvider(create: (context) => di<InventoryCubit>()..fetchInventory()),
+      ],
       child: _ShopItemDetailView(item: item),
     );
   }
@@ -215,35 +221,46 @@ class _ShopItemDetailView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    BlocBuilder<PurchaseCubit, PurchaseState>(
-                      builder: (context, state) {
-                        final isProcessing = state is PurchaseLoading;
-                        return ElevatedButton(
-                          onPressed: isProcessing
-                              ? null
-                              : () {
-                                  context.read<PurchaseCubit>().buyItem(
-                                    item.id,
-                                  );
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          child: isProcessing
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : Text(
-                                  'Beli Sekarang',
-                                  style: AppTextStyles.headingMedium.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                    BlocBuilder<InventoryCubit, InventoryState>(
+                      builder: (context, inventoryState) {
+                        bool isOwned = false;
+                        if (inventoryState is InventoryLoaded) {
+                          isOwned = inventoryState.items.any(
+                            (invItem) => invItem.shopItemId == item.id,
+                          );
+                        }
+
+                        return BlocBuilder<PurchaseCubit, PurchaseState>(
+                          builder: (context, purchaseState) {
+                            final isProcessing = purchaseState is PurchaseLoading;
+                            return ElevatedButton(
+                              onPressed: isOwned || isProcessing
+                                  ? null
+                                  : () {
+                                      context.read<PurchaseCubit>().buyItem(
+                                        item.id,
+                                      );
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isOwned ? Colors.grey : AppColors.primary,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
                                 ),
+                              ),
+                              child: isProcessing
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : Text(
+                                      isOwned ? 'Telah Dimiliki' : 'Beli Sekarang',
+                                      style: AppTextStyles.headingMedium.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                            );
+                          },
                         );
                       },
                     ),

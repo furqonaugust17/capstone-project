@@ -19,6 +19,7 @@ class EquippedAvatarWidget extends StatelessWidget {
       width: size,
       height: size,
       child: Stack(
+        clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
           // The base avatar image
@@ -42,20 +43,20 @@ class EquippedAvatarWidget extends StatelessWidget {
                       );
                     },
                   )
-                : const Icon(
-                    Icons.person,
-                    size: 32,
-                    color: Colors.grey,
-                  ),
+                : const Icon(Icons.person, size: 32, color: Colors.grey),
           ),
-          
+
           // The frame overlaid on top
           if (frameUrl != null)
             Positioned.fill(
-              child: Image.network(
-                frameUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+              child: Transform.scale(
+                scale: 1.2,
+                child: Image.network(
+                  frameUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox.shrink(),
+                ),
               ),
             ),
         ],

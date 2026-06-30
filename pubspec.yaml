@@ -32,6 +32,7 @@ dependencies:
   cached_network_image: ^3.4.1
   connectivity_plus: ^7.1.1
   intl: ^0.20.2
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -49,3 +50,4 @@ flutter:
     - assets/images/home/
     - assets/images/result/
     - assets/images/example/
+    - assets/images/icon.png

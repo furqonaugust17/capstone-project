@@ -58,8 +58,11 @@ class _DrawingPageState extends State<DrawingPage> {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => DrawingExampleDialog(
-        imagePath: widget.selectedAnimalEntity?.hintImageUrl ?? _exampleAssetPath(widget.selectedAnimalEntity?.name),
-        funFact: widget.selectedAnimalEntity?.description,
+        imagePath: widget.selectedAnimalEntity?.hintImageUrl ??
+            _exampleAssetPath(widget.selectedAnimalEntity?.name),
+        funFact: widget.selectedAnimalEntity?.funFact ??
+            widget.selectedAnimalEntity?.description,
+        drawingTips: widget.selectedAnimalEntity?.drawingTips,
       ),
     );
   }
@@ -132,6 +135,7 @@ class _DrawingPageState extends State<DrawingPage> {
     final controller = cubit.controller;
     final showExamplePreview = widget.drawingMode == 'thicken';
     final exampleAssetPath = _exampleAssetPath(widget.selectedAnimalEntity?.name);
+    final traceImageUrl = widget.selectedAnimalEntity?.traceImageUrl;
 
     return BlocProvider<FocusCubit>(
       create: (_) => FocusCubit(),
@@ -217,8 +221,9 @@ class _DrawingPageState extends State<DrawingPage> {
                         child: DrawingCanvas(
                           key: _canvasKey,
                           controller: controller,
-                          traceAssetPath:
-                              showExamplePreview ? exampleAssetPath : null,
+                          traceImagePath: showExamplePreview
+                              ? (traceImageUrl ?? exampleAssetPath)
+                              : null,
                           traceOpacity: opacity,
                         ),
                       );

@@ -10,6 +10,12 @@ class AnimalModel {
   final String? description;
   final String? thumbnailUrl;
   final String? hintImageUrl;
+  @JsonKey(defaultValue: 'easy')
+  final String difficulty;
+  final String? funFact;
+  @JsonKey(defaultValue: [])
+  final List<String> drawingTips;
+  final String? traceImageUrl;
   final bool isActive;
   @JsonKey(defaultValue: 100)
   final int baseScore;
@@ -22,6 +28,10 @@ class AnimalModel {
     this.description,
     this.thumbnailUrl,
     this.hintImageUrl,
+    required this.difficulty,
+    this.funFact,
+    required this.drawingTips,
+    this.traceImageUrl,
     required this.isActive,
     required this.baseScore,
     required this.createdAt,
@@ -39,6 +49,10 @@ class AnimalModel {
         description: description,
         thumbnailUrl: thumbnailUrl,
         hintImageUrl: hintImageUrl,
+        difficulty: difficulty,
+        funFact: funFact,
+        drawingTips: drawingTips,
+        traceImageUrl: traceImageUrl,
         isActive: isActive,
         baseScore: baseScore,
       );

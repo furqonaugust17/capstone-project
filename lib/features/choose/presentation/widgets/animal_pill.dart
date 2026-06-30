@@ -7,13 +7,15 @@ import 'package:app/core/theme/app_text_styles.dart';
 
 class AnimalPill extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final String? imageUrl;
+  final IconData? fallbackIcon;
   final VoidCallback? onTap;
 
   const AnimalPill({
     super.key,
     required this.label,
-    required this.icon,
+    this.imageUrl,
+    this.fallbackIcon = Icons.pets,
     this.onTap,
   });
 
@@ -37,11 +39,34 @@ class AnimalPill extends StatelessWidget {
                 Container(
                   width: 90,
                   height: 90,
+                  alignment: Alignment.center,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, size: 36, color: AppColors.primary),
+                  clipBehavior: Clip.antiAlias,
+                  child: imageUrl != null && imageUrl!.isNotEmpty
+                      ? Transform.scale(
+                          scale: .7,
+                          child: Image.network(
+                            imageUrl!,
+                            fit: BoxFit.contain,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.primary,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              fallbackIcon,
+                              size: 36,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        )
+                      : Icon(fallbackIcon, size: 36, color: AppColors.primary),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(

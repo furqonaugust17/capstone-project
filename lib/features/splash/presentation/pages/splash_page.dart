@@ -29,11 +29,11 @@ class SplashPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo Placeholder (Using icon for now)
-                  const Icon(
-                    Icons.palette,
-                    size: 100,
-                    color: AppColors.primary,
+                  // Logo Image
+                  Image.asset(
+                    'assets/images/icon.png',
+                    width: 150,
+                    height: 150,
                   ),
                   const SizedBox(height: 24),
                   if (state is SplashLoading) ...[

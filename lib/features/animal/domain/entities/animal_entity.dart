@@ -6,6 +6,10 @@ class AnimalEntity extends Equatable {
   final String? description;
   final String? thumbnailUrl;
   final String? hintImageUrl;
+  final String difficulty;
+  final String? funFact;
+  final List<String> drawingTips;
+  final String? traceImageUrl;
   final bool isActive;
   final int baseScore;
 
@@ -15,6 +19,10 @@ class AnimalEntity extends Equatable {
     this.description,
     this.thumbnailUrl,
     this.hintImageUrl,
+    required this.difficulty,
+    this.funFact,
+    required this.drawingTips,
+    this.traceImageUrl,
     required this.isActive,
     required this.baseScore,
   });
@@ -26,6 +34,10 @@ class AnimalEntity extends Equatable {
         description,
         thumbnailUrl,
         hintImageUrl,
+        difficulty,
+        funFact,
+        drawingTips,
+        traceImageUrl,
         isActive,
         baseScore,
       ];

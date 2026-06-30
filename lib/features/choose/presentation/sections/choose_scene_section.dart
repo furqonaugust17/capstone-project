@@ -68,26 +68,11 @@ class ChooseSceneSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: state.animals.map((animal) {
-                    // Simple icon mapping fallback (or use cached network image later)
-                    IconData animalIcon = Icons.pets;
-                    if (animal.name.toLowerCase() == 'sapi') {
-                      animalIcon = Icons.grass;
-                    }
-                    if (animal.name.toLowerCase() == 'bebek') {
-                      animalIcon = Icons.water;
-                    }
-                    if (animal.name.toLowerCase() == 'ikan') {
-                      animalIcon = Icons.set_meal;
-                    }
-                    if (animal.name.toLowerCase().contains('lumba')) {
-                      animalIcon = Icons.pool;
-                    }
-
                     return Padding(
                       padding: const EdgeInsets.only(right: 16.0),
                       child: AnimalPill(
                         label: animal.name,
-                        icon: animalIcon,
+                        imageUrl: animal.thumbnailUrl,
                         onTap: () =>
                             context.push('/mode', extra: {'animal': animal}),
                       ),

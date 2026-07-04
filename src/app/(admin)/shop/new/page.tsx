@@ -10,7 +10,7 @@ import { ShopItemFormValues } from '@/lib/validators';
 
 export default function CreateShopItemPage() {
   const router = useRouter();
-  
+
   const { execute: createItem, isLoading } = useApi(shopService.createItem, {
     successMessage: 'Item toko berhasil ditambahkan',
     onSuccess: () => router.push('/shop'),
@@ -32,7 +32,7 @@ export default function CreateShopItemPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-4">
         <Button variant="outline" size="icon" onClick={() => router.push('/shop')}>
           <ArrowLeft className="h-4 w-4" />
@@ -44,10 +44,10 @@ export default function CreateShopItemPage() {
       </div>
 
       <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 shadow-sm">
-        <ShopItemForm 
-          onSubmit={handleSubmit} 
-          isLoading={isLoading} 
-          isEditMode={false} 
+        <ShopItemForm
+          onSubmit={handleSubmit}
+          isLoading={isLoading}
+          isEditMode={false}
         />
       </div>
     </div>

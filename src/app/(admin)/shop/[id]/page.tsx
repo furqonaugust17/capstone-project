@@ -56,7 +56,7 @@ export default function EditShopItemPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-4">
         <Button variant="outline" size="icon" onClick={() => router.push('/shop')}>
           <ArrowLeft className="h-4 w-4" />
@@ -68,11 +68,11 @@ export default function EditShopItemPage() {
       </div>
 
       <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 shadow-sm">
-        <ShopItemForm 
+        <ShopItemForm
           initialData={item}
-          onSubmit={handleSubmit} 
-          isLoading={isUpdating} 
-          isEditMode={true} 
+          onSubmit={handleSubmit}
+          isLoading={isUpdating}
+          isEditMode={true}
         />
       </div>
     </div>

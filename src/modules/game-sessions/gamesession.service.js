@@ -161,9 +161,24 @@ const getSessionById = async (id, user) => {
   return session;
 };
 
+const getSessionsForExport = async (userId = undefined) => {
+  const where = userId ? { userId } : {};
+  
+  return prisma.gameSession.findMany({
+    where,
+    include: {
+      user: { select: { username: true, email: true } },
+      animal: { select: { name: true } },
+      model: { select: { name: true, version: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
 module.exports = {
   createSession,
   getMySessions,
   getAllSessions,
   getSessionById,
+  getSessionsForExport,
 };

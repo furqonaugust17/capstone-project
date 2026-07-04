@@ -12,6 +12,7 @@ router.use(authenticate);
 router.post('/', uploadImage.single('file'), gameSessionController.store);
 router.get('/', gameSessionController.index);
 router.get('/all', requireAdmin, gameSessionController.getAll);
+router.get('/export', requireAdmin, gameSessionController.exportCSV);
 router.get('/:id', gameSessionController.show);
 
 module.exports = router;

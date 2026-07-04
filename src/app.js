@@ -19,11 +19,11 @@ app.use(helmet());
 // CORS whitelist setup
 const allowedOrigins = env.NODE_ENV === 'production'
   ? ['https://admin-capstone.furqonaugust.site']
-  : ['http://localhost:5173', 'http://localhost:3000', '*']; // adjust local origins
+  : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3317']; // adjust local origins
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

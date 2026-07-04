@@ -32,7 +32,7 @@ export default function AnimalsPage() {
       limit,
       search: debouncedFilters.search || undefined,
     });
-    console.log(data)
+
   }, [page, limit, debouncedFilters, fetchAnimals]);
 
   const handleDelete = async () => {

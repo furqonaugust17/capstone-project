@@ -114,7 +114,7 @@ export default function StatisticsPage() {
                 )}
               </div>
               <div>
-                <p className="text-2xl font-bold text-amber-950 dark:text-amber-100">{animalsData?.mostPopular?.name || 'N/A'}</p>
+                <p className="text-2xl font-bold text-amber-950 dark:text-amber-100">{animalsData?.mostPopular?.animalName || 'N/A'}</p>
                 <p className="text-sm font-medium text-amber-700 dark:text-amber-500">total {animalsData?.mostPopular?.totalPlayed?.toLocaleString() || 0} permainan dimainkan</p>
               </div>
             </div>
@@ -135,7 +135,7 @@ export default function StatisticsPage() {
                 )}
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{animalsData?.leastPopular?.name || 'N/A'}</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{animalsData?.leastPopular?.animalName || 'N/A'}</p>
                 <p className="text-sm font-medium text-slate-600 dark:text-slate-500">Hanya {animalsData?.leastPopular?.totalPlayed?.toLocaleString() || 0} permainan dimainkan</p>
               </div>
             </div>
@@ -155,7 +155,7 @@ export default function StatisticsPage() {
               <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                 <BarChart data={animalsData.stats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <XAxis dataKey="animalName" tick={{ fontSize: 12 }} />
                   <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
                   <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
                   <RechartsTooltip

@@ -1,0 +1,21 @@
+services:
+  admin-panel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Ganti dengan URL API backend production Anda
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://backend-capstone.furqonaugust.site/api}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Educational Animal Drawing Game Admin}
+    container_name: anidraw-admin-panel
+    ports:
+      - "${APP_PORT:-3317}:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

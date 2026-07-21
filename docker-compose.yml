@@ -1,0 +1,145 @@
+###############################################
+# Docker Compose - Production
+# Capstone Project: Educational Animal Drawing Game
+###############################################
+
+services:
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: capstone-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-capstone_project}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - capstone-postgres-data:/var/lib/postgresql/data
+      - ./db_capstone.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-capstone_project}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - capstone-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # ============================================
+  # Redis Cache
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: capstone-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - capstone-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - capstone-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # ============================================
+  # Backend API (Express.js + Prisma)
+  # ============================================
+  backend:
+    image: furqonaugustseventeenth/backend-capstone:latest
+    container_name: backend-capstone
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-3308}:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-capstone_project}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET is required}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-1d}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
+      REDIS_URL: redis://redis:6379
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - capstone-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # ============================================
+  # Admin Panel (Next.js)
+  # ============================================
+  admin-panel:
+    image: furqonaugustseventeenth/admin-panel-capstone:latest
+    container_name: admin-panel-capstone
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-3317}:3000"
+    environment:
+      NODE_ENV: production
+      HOSTNAME: "0.0.0.0"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - capstone-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+# ============================================
+# Persistent Volumes
+# ============================================
+volumes:
+  capstone-postgres-data:
+    driver: local
+  capstone-redis-data:
+    driver: local
+
+# ============================================
+# Network
+# ============================================
+networks:
+  capstone-network:
+    driver: bridge

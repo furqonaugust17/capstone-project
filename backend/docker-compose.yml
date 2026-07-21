@@ -1,0 +1,62 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: capstone-backend
+    restart: unless-stopped
+    ports:
+      - "3308:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgres://postgres:postgres123@postgres:5432/capstone_project
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - capstone-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: capstone-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: capstone_project
+    ports:
+      - "5433:5432"
+    volumes:
+      - capstone-postgres-data:/var/lib/postgresql/data
+      - ./db_capstone.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d capstone_project"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - capstone-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: capstone-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - capstone-redis-data:/data
+    networks:
+      - capstone-network
+
+volumes:
+  capstone-postgres-data:
+  capstone-redis-data:
+
+networks:
+  capstone-network:
+    driver: bridge

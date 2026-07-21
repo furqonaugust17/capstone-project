@@ -8,6 +8,10 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
   DATABASE_URL: z.url(),
+  DIRECT_URL: z.url().optional(),
+
+  REDIS_URL: z.string().optional(),
+  CRON_SECRET: z.string().min(1).default('development_secret'),
 
   JWT_ACCESS_SECRET: z.string().min(1),
   JWT_REFRESH_SECRET: z.string().min(1),

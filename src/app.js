@@ -121,7 +121,9 @@ app.use((req, res) => {
 // Global Error Handler
 app.use(errorHandler);
 
-// Initialize Cron Jobs
-require('./jobs/cron');
+const cronRoutes = require('./modules/cron/cron.routes');
+
+// Mount routes
+app.use('/api/cron', cronRoutes);
 
 module.exports = app;

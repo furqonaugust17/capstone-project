@@ -3,12 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const { env } = require('../config/env');
 
-// Pastikan folder logs ada
-const logDir = 'logs';
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
-}
-
 // Konfigurasi format
 const { combine, timestamp, printf, colorize, errors } = winston.format;
 
@@ -26,12 +20,11 @@ const logger = winston.createLogger({
   transports: [
     // Error log file
     new winston.transports.File({
-      filename: path.join(logDir, 'error.log'),
       level: 'error',
     }),
     // Combined log file
     new winston.transports.File({
-      filename: path.join(logDir, 'combined.log'),
+      level: 'info'
     }),
   ],
 });

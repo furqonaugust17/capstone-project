@@ -18,12 +18,12 @@ const logger = winston.createLogger({
     logFormat
   ),
   transports: [
-    // Error log file
-    new winston.transports.File({
+    // Error log 
+    new winston.transports.Console({
       level: 'error',
     }),
-    // Combined log file
-    new winston.transports.File({
+    // Combined log
+    new winston.transports.Console({
       level: 'info'
     }),
   ],
